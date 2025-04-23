@@ -1,0 +1,14 @@
+## Title: TSCPriceFetcher
+## Author: @besidemyself
+## Description: A price lookup tool for fetching item prices by ID
+## APIVersion: 101045
+## Version: 0.0.1
+## AddOnVersion: 0.0.1
+## SavedVariables: TSCPriceFetcherData
+
+# Load price data first
+TSCPriceData.lua
+TSCPriceNameData.lua
+
+# Then load the main addon
+TSCPriceFetcher.lua
