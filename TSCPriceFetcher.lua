@@ -337,7 +337,7 @@ function InitializeAddon()
 
     -- Add this after SetupAllHooks()
     if TSCPriceFetcher.settings.debugMode then
-        zo_callLater(function() TestTooltip() end, 2000) -- Test 2 seconds after loading
+        zo_callLater(function() TestTooltip() end, 5000)
     end
 end
 
@@ -361,8 +361,31 @@ end
 EVENT_MANAGER:RegisterForEvent(TSCPriceFetcher.name, EVENT_ADD_ON_LOADED, OnAddOnLoaded)
 
 function TestTooltip()
+    DebugLog("TestTooltip: Attempting to show test tooltip")
+
+    -- Check if we're in gamepad mode
+    if not IsInGamepadPreferredMode() then
+        d("|cFF0000TSCPriceFetcher: Test tooltip failed - not in gamepad mode|r")
+        DebugLog("TestTooltip: Not in gamepad mode")
+        return
+    end
+
+    -- Safely check if tooltip system exists
+    if not GAMEPAD_TOOLTIPS then
+        d("|cFF0000TSCPriceFetcher: Test tooltip failed - tooltip system not available|r")
+        DebugLog("TestTooltip: GAMEPAD_TOOLTIPS is nil")
+        return
+    end
+
     local testItemLink = "|H1:item:43563:366:50:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h|h" -- Common item
     local tooltip = GAMEPAD_TOOLTIPS:GetTooltip(GAMEPAD_LEFT_TOOLTIP)
+    if not tooltip then
+        d("|cFF0000TSCPriceFetcher: Test tooltip failed - tooltip object not available|r")
+        DebugLog("TestTooltip: Tooltip object is nil")
+        return
+    end
+
     tooltip:SetLink(testItemLink)
     d("Test tooltip displayed")
+    DebugLog("TestTooltip: Test tooltip displayed successfully")
 end
