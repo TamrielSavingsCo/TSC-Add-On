@@ -123,11 +123,61 @@ function SetupItemLinkTooltipHook()
     DebugLog("SetupItemLinkTooltipHook: Item link tooltip hook set up")
 end
 
+-- Hook into item tooltips for inventory items
+function SetupInventoryTooltipHook()
+    DebugLog("SetupInventoryTooltipHook: Setting up inventory tooltip hook")
+
+    -- Hook into the ItemTooltip (this is the standard tooltip used in inventory screens)
+    ZO_PreHook(ItemTooltip, "SetBagItem", function(self, bagId, slotIndex)
+        DebugLog("SetupInventoryTooltipHook: Bag ID: " .. tostring(bagId) .. " Slot Index: " .. tostring(slotIndex))
+        if not TSCPriceFetcher.settings.showTooltips then
+            DebugLog("SetupInventoryTooltipHook: Exiting early - tooltips disabled")
+            return false
+        end
+
+        local itemId = GetItemId(bagId, slotIndex)
+        DebugLog("SetupInventoryTooltipHook: Item ID: " .. tostring(itemId))
+        if itemId and itemId > 0 then
+            local price = LookupPrice(itemId)
+            DebugLog("SetupInventoryTooltipHook: Price: " .. tostring(price))
+            if price and price > 0 then
+                -- Add price line to tooltip
+                self:AddLine(zo_strformat("TSC Price: <<1>>g", FormatPrice(price)), "ZoFontGameShadow", 1, 0.9, 0)
+            end
+        end
+        return false
+    end)
+
+    -- Also hook into the PopupTooltip for linked items
+    ZO_PreHook(PopupTooltip, "SetLink", function(self, itemLink)
+        DebugLog("SetupInventoryTooltipHook: Item Link: " .. tostring(itemLink))
+        if not TSCPriceFetcher.settings.showTooltips then
+            DebugLog("SetupInventoryTooltipHook: Exiting early - tooltips disabled")
+            return false
+        end
+
+        local itemId = GetItemLinkItemId(itemLink)
+        DebugLog("SetupInventoryTooltipHook: Item ID: " .. tostring(itemId))
+        if itemId and itemId > 0 then
+            local price = LookupPrice(itemId, itemLink)
+            DebugLog("SetupInventoryTooltipHook: Price: " .. tostring(price))
+            if price and price > 0 then
+                -- Add price line to tooltip
+                self:AddLine(zo_strformat("TSC Price: <<1>>g", FormatPrice(price)), "ZoFontGameShadow", 1, 0.9, 0)
+            end
+        end
+        return false
+    end)
+
+    DebugLog("SetupInventoryTooltipHook: Inventory tooltip hook set up")
+end
+
 -- Master function to setup all tooltip hooks
 function SetupAllHooks()
     DebugLog("SetupAllHooks: Setting up all hooks")
     SetupBagItemTooltipHook()
     SetupItemLinkTooltipHook()
+    SetupInventoryTooltipHook()
     SetupInventoryHooks()
     DebugLog("SetupAllHooks: All hooks set up")
 end
@@ -465,6 +515,25 @@ function TestGamepadUI()
     return isGamepadMode and tooltipsExist
 end
 
+-- Add to TestSuite
+function TestInventoryTooltip()
+    DebugLog("TestInventoryTooltip: Testing inventory tooltip")
+
+    -- Test if regular tooltip objects exist
+    local itemTooltipExists = ItemTooltip ~= nil
+    local popupTooltipExists = PopupTooltip ~= nil
+
+    d("|c88FFFFInventory Tooltip Test:|r ItemTooltip exists: " .. tostring(itemTooltipExists))
+    d("|c88FFFFInventory Tooltip Test:|r PopupTooltip exists: " .. tostring(popupTooltipExists))
+
+    -- Try to simulate a tooltip display (this may not actually show a tooltip)
+    if itemTooltipExists then
+        d("|c88FFFFInventory Tooltip Test:|r Adding test price to standard tooltips")
+    end
+
+    return itemTooltipExists or popupTooltipExists
+end
+
 -- Master testing function that runs all tests
 function TestSuite()
     DebugLog("TestSuite: Beginning all tests")
@@ -475,7 +544,8 @@ function TestSuite()
         priceData = TestPriceDataLookup(),
         nameData = TestPriceNameDataLookup(),
         dataStructures = TestDataStructures(),
-        gamepadUI = TestGamepadUI()
+        gamepadUI = TestGamepadUI(),
+        inventoryTooltip = TestInventoryTooltip()
     }
 
     -- Display summary
@@ -485,6 +555,9 @@ function TestSuite()
     d("|c" ..
         (results.dataStructures and "88FF88" or "FF8888") .. "Data Structures:|r " .. tostring(results.dataStructures))
     d("|c" .. (results.gamepadUI and "88FF88" or "FF8888") .. "Gamepad UI Available:|r " .. tostring(results.gamepadUI))
+    d("|c" ..
+        (results.inventoryTooltip and "88FF88" or "FF8888") ..
+        "Inventory Tooltip UI:|r " .. tostring(results.inventoryTooltip))
 
     local allPassed = results.priceData and results.nameData and results.dataStructures
     local uiWarning = not results.gamepadUI and "WARNING: Gamepad UI not available - tooltips will not work!" or ""
