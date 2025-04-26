@@ -360,32 +360,71 @@ end
 ---@diagnostic disable-next-line: param-type-mismatch
 EVENT_MANAGER:RegisterForEvent(TSCPriceFetcher.name, EVENT_ADD_ON_LOADED, OnAddOnLoaded)
 
+-- Replace the TestTooltip function to test specific items
 function TestTooltip()
-    DebugLog("TestTooltip: Attempting to show test tooltip")
+    DebugLog("TestTooltip: Starting targeted item tests")
 
-    -- Check if we're in gamepad mode
-    if not IsInGamepadPreferredMode() then
-        d("|cFF0000TSCPriceFetcher: Test tooltip failed - not in gamepad mode|r")
-        DebugLog("TestTooltip: Not in gamepad mode")
-        return
+    -- Test specific item by ID
+    local testItemId = 34349 -- Acai Berry
+
+    -- Look up the price directly
+    local price = LookupPrice(testItemId)
+    DebugLog("TestTooltip: Price lookup for Acai Berry (ID: " .. testItemId .. "): " .. tostring(price))
+    d("|c88FFFFPrice Test:|r Acai Berry (ID: " .. testItemId .. ") price: " .. tostring(price or "not found"))
+
+    -- If price data is missing, add it for testing
+    if not price or price <= 0 then
+        if not TSCPriceData then TSCPriceData = {} end
+        TSCPriceData[testItemId] = { price = 123 }
+        d("|cFFFF88Note:|r Created test price 123 for Acai Berry (ID: " .. testItemId .. ")")
+
+        -- Test lookup again
+        price = LookupPrice(testItemId)
+        d("|c88FFFFPrice Test:|r After adding data - Acai Berry price: " .. tostring(price or "still not found"))
     end
 
-    -- Safely check if tooltip system exists
-    if not GAMEPAD_TOOLTIPS then
-        d("|cFF0000TSCPriceFetcher: Test tooltip failed - tooltip system not available|r")
-        DebugLog("TestTooltip: GAMEPAD_TOOLTIPS is nil")
-        return
+    -- Test specific named item
+    local namedItemLink = "|H1:item:123456:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h[Abyssal Brace Gauntlets]|h"
+    local itemName = "Abyssal Brace Gauntlets"
+
+    -- Test if TSCPriceNameData exists
+    if not TSCPriceNameData then
+        d("|cFF8888Price Test:|r TSCPriceNameData table missing")
+        DebugLog("TestTooltip: TSCPriceNameData table not found")
+        TSCPriceNameData = {}
     end
 
-    local testItemLink = "|H1:item:43563:366:50:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h|h" -- Common item
-    local tooltip = GAMEPAD_TOOLTIPS:GetTooltip(GAMEPAD_LEFT_TOOLTIP)
-    if not tooltip then
-        d("|cFF0000TSCPriceFetcher: Test tooltip failed - tooltip object not available|r")
-        DebugLog("TestTooltip: Tooltip object is nil")
-        return
+    -- Add the test item to the name data
+    TSCPriceNameData[itemName] = { price = 10000 }
+    d("|cFFFF88Note:|r Added test price 10000 for " .. itemName)
+
+    -- Test name lookup through the regular function
+    local mockedItemLink = namedItemLink
+    local namePrice = LookupPrice(123456, mockedItemLink)
+    d("|c88FFFFPrice Test:|r " .. itemName .. " price: " .. tostring(namePrice or "not found"))
+    DebugLog("TestTooltip: Price lookup for " .. itemName .. ": " .. tostring(namePrice))
+
+    -- Check internal data structures
+    DebugLog("TestTooltip: TSCPriceData exists: " .. tostring(TSCPriceData ~= nil))
+    DebugLog("TestTooltip: TSCPriceNameData exists: " .. tostring(TSCPriceNameData ~= nil))
+
+    -- Display data structure details
+    local idCount = 0
+    if TSCPriceData then
+        for _ in pairs(TSCPriceData) do idCount = idCount + 1 end
     end
 
-    tooltip:SetLink(testItemLink)
-    d("Test tooltip displayed")
-    DebugLog("TestTooltip: Test tooltip displayed successfully")
+    local nameCount = 0
+    if TSCPriceNameData then
+        for _ in pairs(TSCPriceNameData) do nameCount = nameCount + 1 end
+    end
+
+    d("|c88FFFFData Summary:|r ID entries: " .. idCount .. ", Name entries: " .. nameCount)
+
+    -- Also check UI state just as a reference
+    local isGamepadMode = IsInGamepadPreferredMode()
+    DebugLog("TestTooltip: IsInGamepadPreferredMode(): " .. tostring(isGamepadMode))
+    d("|c88FFFFGamepad Mode:|r " .. tostring(isGamepadMode))
+
+    DebugLog("TestTooltip: Targeted item tests complete")
 end
