@@ -290,18 +290,55 @@ function CheckPriceDataVersion()
     return dataIsCurrent
 end
 
+-- Check if data file is loaded correctly
+function ValidatePriceData()
+    if not TSCPriceData then
+        d("|cFF0000TSCPriceFetcher: ERROR - Price data not found! Please reinstall the addon.|r")
+        DebugLog("ValidatePriceData: TSCPriceData not found")
+        return false
+    end
+
+    local entryCount = 0
+    for _ in pairs(TSCPriceData) do
+        entryCount = entryCount + 1
+        if entryCount > 1000 then break end -- Just count a sample for performance
+    end
+
+    DebugLog("ValidatePriceData: Found " .. entryCount .. " price entries")
+
+    if entryCount < 10 then
+        d("|cFF0000TSCPriceFetcher: WARNING - Price data seems incomplete! Only " .. entryCount .. " entries found.|r")
+        DebugLog("ValidatePriceData: Price data seems incomplete")
+        return false
+    end
+
+    return true
+end
+
 -- Initialize the addon
 function InitializeAddon()
-    -- Check data versions first
+    -- Only validate data in debug mode
+    if TSCPriceFetcher.settings.debugMode then
+        DebugLog("InitializeAddon: Validating price data")
+        ValidatePriceData()
+        DebugLog("InitializeAddon: Price data validated")
+    end
+
+    -- Check data versions when ready
     -- TODO: RE-ENABLE AFTER TESTING BASIC FUNCTIONALITY
     -- local dataIsCurrent = CheckPriceDataVersion()
 
     -- Continue with initialization
     SetupAllHooks()
 
-    -- Mention data status in init message
-    -- local statusMsg = dataIsCurrent and "" or " WARNING: Price data is outdated!"
-    -- d(zo_strformat("<<1>> v<<2>> initialized.<<3>>", TSCPriceFetcher.name, TSCPriceFetcher.version, statusMsg))
+    -- Log successful initialization
+    DebugLog("InitializeAddon: Successfully initialized")
+    d("|c88FFFFTSCP|r|cFFDDAArice|r|c88FFFFetcher|r v" .. TSCPriceFetcher.version .. " initialized")
+
+    -- Add this after SetupAllHooks()
+    if TSCPriceFetcher.settings.debugMode then
+        zo_callLater(function() TestTooltip() end, 2000) -- Test 2 seconds after loading
+    end
 end
 
 -- Event handler for when the addon loads
@@ -322,3 +359,10 @@ end
 -- Register for the addon loaded event
 ---@diagnostic disable-next-line: param-type-mismatch
 EVENT_MANAGER:RegisterForEvent(TSCPriceFetcher.name, EVENT_ADD_ON_LOADED, OnAddOnLoaded)
+
+function TestTooltip()
+    local testItemLink = "|H1:item:43563:366:50:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h|h" -- Common item
+    local tooltip = GAMEPAD_TOOLTIPS:GetTooltip(GAMEPAD_LEFT_TOOLTIP)
+    tooltip:SetLink(testItemLink)
+    d("Test tooltip displayed")
+end
