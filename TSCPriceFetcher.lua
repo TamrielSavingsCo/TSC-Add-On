@@ -337,7 +337,7 @@ function InitializeAddon()
 
     -- Add this after SetupAllHooks()
     if TSCPriceFetcher.settings.debugMode then
-        zo_callLater(function() TestTooltip() end, 5000)
+        zo_callLater(function() TestSuite() end, 5000)
     end
 end
 
@@ -360,16 +360,19 @@ end
 ---@diagnostic disable-next-line: param-type-mismatch
 EVENT_MANAGER:RegisterForEvent(TSCPriceFetcher.name, EVENT_ADD_ON_LOADED, OnAddOnLoaded)
 
--- Replace the TestTooltip function to test specific items
-function TestTooltip()
-    DebugLog("TestTooltip: Starting targeted item tests")
+-- TESTING UTILITY FUNCTIONS
+-----------------------------------------------------------------
+
+-- Tests basic price data lookup by ID
+function TestPriceDataLookup()
+    DebugLog("TestPriceDataLookup: Testing item ID lookup")
 
     -- Test specific item by ID
     local testItemId = 34349 -- Acai Berry
 
     -- Look up the price directly
     local price = LookupPrice(testItemId)
-    DebugLog("TestTooltip: Price lookup for Acai Berry (ID: " .. testItemId .. "): " .. tostring(price))
+    DebugLog("TestPriceDataLookup: Price lookup for Acai Berry (ID: " .. testItemId .. "): " .. tostring(price))
     d("|c88FFFFPrice Test:|r Acai Berry (ID: " .. testItemId .. ") price: " .. tostring(price or "not found"))
 
     -- If price data is missing, add it for testing
@@ -383,6 +386,13 @@ function TestTooltip()
         d("|c88FFFFPrice Test:|r After adding data - Acai Berry price: " .. tostring(price or "still not found"))
     end
 
+    return price and price > 0
+end
+
+-- Tests name-based price data lookup
+function TestPriceNameDataLookup()
+    DebugLog("TestPriceNameDataLookup: Testing item name lookup")
+
     -- Test specific named item
     local namedItemLink = "|H1:item:123456:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h[Abyssal Brace Gauntlets]|h"
     local itemName = "Abyssal Brace Gauntlets"
@@ -390,7 +400,7 @@ function TestTooltip()
     -- Test if TSCPriceNameData exists
     if not TSCPriceNameData then
         d("|cFF8888Price Test:|r TSCPriceNameData table missing")
-        DebugLog("TestTooltip: TSCPriceNameData table not found")
+        DebugLog("TestPriceNameDataLookup: TSCPriceNameData table not found")
         TSCPriceNameData = {}
     end
 
@@ -402,11 +412,18 @@ function TestTooltip()
     local mockedItemLink = namedItemLink
     local namePrice = LookupPrice(123456, mockedItemLink)
     d("|c88FFFFPrice Test:|r " .. itemName .. " price: " .. tostring(namePrice or "not found"))
-    DebugLog("TestTooltip: Price lookup for " .. itemName .. ": " .. tostring(namePrice))
+    DebugLog("TestPriceNameDataLookup: Price lookup for " .. itemName .. ": " .. tostring(namePrice))
+
+    return namePrice and namePrice > 0
+end
+
+-- Tests price data structure integrity
+function TestDataStructures()
+    DebugLog("TestDataStructures: Checking data structures")
 
     -- Check internal data structures
-    DebugLog("TestTooltip: TSCPriceData exists: " .. tostring(TSCPriceData ~= nil))
-    DebugLog("TestTooltip: TSCPriceNameData exists: " .. tostring(TSCPriceNameData ~= nil))
+    DebugLog("TestDataStructures: TSCPriceData exists: " .. tostring(TSCPriceData ~= nil))
+    DebugLog("TestDataStructures: TSCPriceNameData exists: " .. tostring(TSCPriceNameData ~= nil))
 
     -- Display data structure details
     local idCount = 0
@@ -421,10 +438,60 @@ function TestTooltip()
 
     d("|c88FFFFData Summary:|r ID entries: " .. idCount .. ", Name entries: " .. nameCount)
 
-    -- Also check UI state just as a reference
+    return TSCPriceData ~= nil and idCount > 0
+end
+
+-- Tests gamepad UI availability
+function TestGamepadUI()
+    DebugLog("TestGamepadUI: Checking UI state")
+
+    -- Check if we're in gamepad mode
     local isGamepadMode = IsInGamepadPreferredMode()
-    DebugLog("TestTooltip: IsInGamepadPreferredMode(): " .. tostring(isGamepadMode))
+    DebugLog("TestGamepadUI: IsInGamepadPreferredMode(): " .. tostring(isGamepadMode))
     d("|c88FFFFGamepad Mode:|r " .. tostring(isGamepadMode))
 
-    DebugLog("TestTooltip: Targeted item tests complete")
+    -- Then check if the global objects exist
+    local tooltipsExist = GAMEPAD_TOOLTIPS ~= nil
+    d("|c88FFFFGamepad Test:|r GAMEPAD_TOOLTIPS exists: " .. tostring(tooltipsExist))
+    DebugLog("TestGamepadUI: GAMEPAD_TOOLTIPS exists: " .. tostring(tooltipsExist))
+
+    -- Report more detailed info if tooltips exist
+    if tooltipsExist then
+        d("|c88FFFFGamepad Test:|r Tooltip object type: " .. type(GAMEPAD_TOOLTIPS))
+        d("|c88FFFFGamepad Test:|r GetTooltip method exists: " ..
+            tostring(type(GAMEPAD_TOOLTIPS.GetTooltip) == "function"))
+    end
+
+    return isGamepadMode and tooltipsExist
+end
+
+-- Master testing function that runs all tests
+function TestSuite()
+    DebugLog("TestSuite: Beginning all tests")
+    d("|c88FFFF==== TSCPriceFetcher TEST SUITE ====|r")
+
+    -- Run each test and collect results
+    local results = {
+        priceData = TestPriceDataLookup(),
+        nameData = TestPriceNameDataLookup(),
+        dataStructures = TestDataStructures(),
+        gamepadUI = TestGamepadUI()
+    }
+
+    -- Display summary
+    d("|c88FFFF==== TEST RESULTS ====|r")
+    d("|c" .. (results.priceData and "88FF88" or "FF8888") .. "Price Data Lookup:|r " .. tostring(results.priceData))
+    d("|c" .. (results.nameData and "88FF88" or "FF8888") .. "Name Data Lookup:|r " .. tostring(results.nameData))
+    d("|c" ..
+        (results.dataStructures and "88FF88" or "FF8888") .. "Data Structures:|r " .. tostring(results.dataStructures))
+    d("|c" .. (results.gamepadUI and "88FF88" or "FF8888") .. "Gamepad UI Available:|r " .. tostring(results.gamepadUI))
+
+    local allPassed = results.priceData and results.nameData and results.dataStructures
+    local uiWarning = not results.gamepadUI and "WARNING: Gamepad UI not available - tooltips will not work!" or ""
+
+    d("|c" .. (allPassed and "88FF88" or "FF8888") .. "Overall Result:|r " .. (allPassed and "PASS" or "FAIL") ..
+        (uiWarning ~= "" and " - " .. uiWarning or ""))
+
+    DebugLog("TestSuite: Tests completed")
+    return results
 end
