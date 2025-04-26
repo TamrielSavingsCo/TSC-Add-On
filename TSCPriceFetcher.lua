@@ -127,45 +127,51 @@ end
 function SetupInventoryTooltipHook()
     DebugLog("SetupInventoryTooltipHook: Setting up inventory tooltip hook")
 
-    -- Hook into the ItemTooltip (this is the standard tooltip used in inventory screens)
-    ZO_PreHook(ItemTooltip, "SetBagItem", function(self, bagId, slotIndex)
-        DebugLog("SetupInventoryTooltipHook: Bag ID: " .. tostring(bagId) .. " Slot Index: " .. tostring(slotIndex))
-        if not TSCPriceFetcher.settings.showTooltips then
-            DebugLog("SetupInventoryTooltipHook: Exiting early - tooltips disabled")
-            return false
-        end
+    -- Hook specifically into the inventory tooltip shown in your screenshot
+    ZO_PreHookHandler(ItemTooltip, "OnAddGameData", function(self, gameDataType, ...)
+        DebugLog("SetupInventoryTooltipHook: OnAddGameData triggered, type: " .. tostring(gameDataType))
 
-        local itemId = GetItemId(bagId, slotIndex)
-        DebugLog("SetupInventoryTooltipHook: Item ID: " .. tostring(itemId))
-        if itemId and itemId > 0 then
-            local price = LookupPrice(itemId)
-            DebugLog("SetupInventoryTooltipHook: Price: " .. tostring(price))
-            if price and price > 0 then
-                -- Add price line to tooltip
-                self:AddLine(zo_strformat("TSC Price: <<1>>g", FormatPrice(price)), "ZoFontGameShadow", 1, 0.9, 0)
+        -- We need to get the item info from the tooltip's current item
+        if not self.lastItemLink then return false end
+
+        local itemLink = self.lastItemLink
+        DebugLog("SetupInventoryTooltipHook: Item Link: " .. tostring(itemLink))
+
+        -- Only add our price at the end of the tooltip
+        -- TOOLTIP_GAME_DATA_DESCRIPTION is when description is added, which is usually last
+        if gameDataType == TOOLTIP_GAME_DATA_DESCRIPTION then
+            local itemId = GetItemLinkItemId(itemLink)
+            DebugLog("SetupInventoryTooltipHook: Item ID: " .. tostring(itemId))
+
+            if itemId and itemId > 0 then
+                local price = LookupPrice(itemId, itemLink)
+                DebugLog("SetupInventoryTooltipHook: Price: " .. tostring(price))
+                if price and price > 0 then
+                    -- Add custom TSC price line
+                    self:AddLine("")
+                    self:AddLine("TSC Price: " .. FormatPrice(price) .. "g", "ZoFontGame", 1, 0.9, 0)
+                    DebugLog("SetupInventoryTooltipHook: Added price line")
+                end
             end
         end
+
         return false
     end)
 
-    -- Also hook into the PopupTooltip for linked items
-    ZO_PreHook(PopupTooltip, "SetLink", function(self, itemLink)
-        DebugLog("SetupInventoryTooltipHook: Item Link: " .. tostring(itemLink))
-        if not TSCPriceFetcher.settings.showTooltips then
-            DebugLog("SetupInventoryTooltipHook: Exiting early - tooltips disabled")
-            return false
-        end
+    -- Store item link when SetBagItem is called so we can use it later
+    ZO_PreHook(ItemTooltip, "SetBagItem", function(self, bagId, slotIndex)
+        DebugLog("SetupInventoryTooltipHook: SetBagItem called")
+        local itemLink = GetItemLink(bagId, slotIndex)
+        self.lastItemLink = itemLink
+        DebugLog("SetupInventoryTooltipHook: Stored item link: " .. tostring(itemLink))
+        return false
+    end)
 
-        local itemId = GetItemLinkItemId(itemLink)
-        DebugLog("SetupInventoryTooltipHook: Item ID: " .. tostring(itemId))
-        if itemId and itemId > 0 then
-            local price = LookupPrice(itemId, itemLink)
-            DebugLog("SetupInventoryTooltipHook: Price: " .. tostring(price))
-            if price and price > 0 then
-                -- Add price line to tooltip
-                self:AddLine(zo_strformat("TSC Price: <<1>>g", FormatPrice(price)), "ZoFontGameShadow", 1, 0.9, 0)
-            end
-        end
+    -- Also store link directly when SetLink is called
+    ZO_PreHook(ItemTooltip, "SetLink", function(self, itemLink)
+        DebugLog("SetupInventoryTooltipHook: SetLink called")
+        self.lastItemLink = itemLink
+        DebugLog("SetupInventoryTooltipHook: Stored item link: " .. tostring(itemLink))
         return false
     end)
 
