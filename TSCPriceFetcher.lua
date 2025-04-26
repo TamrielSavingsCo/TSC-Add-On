@@ -96,6 +96,7 @@ function SetupBagItemTooltipHook()
         end
         return false
     end)
+    DebugLog("SetupBagItemTooltipHook: Bag item tooltip hook set up")
 end
 
 -- Hook into item tooltips for item links (chat, quest rewards, etc.)
@@ -119,14 +120,16 @@ function SetupItemLinkTooltipHook()
         end
         return false
     end)
+    DebugLog("SetupItemLinkTooltipHook: Item link tooltip hook set up")
 end
 
 -- Master function to setup all tooltip hooks
-function SetupTooltipHooks()
-    DebugLog("SetupTooltipHooks: Setting up hooks")
+function SetupAllHooks()
+    DebugLog("SetupAllHooks: Setting up all hooks")
     SetupBagItemTooltipHook()
     SetupItemLinkTooltipHook()
-    DebugLog("SetupTooltipHooks: All hooks set up")
+    SetupInventoryHooks()
+    DebugLog("SetupAllHooks: All hooks set up")
 end
 
 -- Hook into inventory item display to show prices
@@ -169,6 +172,7 @@ function SetupInventoryHooks()
 
         return false
     end)
+    DebugLog("SetupInventoryHooks: Inventory hook set up")
 end
 
 -- Function to convert date string to timestamp - optimized for console
@@ -293,8 +297,7 @@ function InitializeAddon()
     -- local dataIsCurrent = CheckPriceDataVersion()
 
     -- Continue with initialization
-    SetupTooltipHooks()
-    SetupInventoryHooks()
+    SetupAllHooks()
 
     -- Mention data status in init message
     -- local statusMsg = dataIsCurrent and "" or " WARNING: Price data is outdated!"
