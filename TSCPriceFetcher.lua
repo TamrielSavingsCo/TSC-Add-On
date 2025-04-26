@@ -123,34 +123,45 @@ function SetupItemLinkTooltipHook()
     DebugLog("SetupItemLinkTooltipHook: Item link tooltip hook set up")
 end
 
--- Hook into item tooltips for inventory items
-function SetupInventoryTooltipHook()
-    DebugLog("SetupInventoryTooltipHook: Setting up inventory tooltip hook")
+-- Hook into keyboard mode tooltips directly
+function SetupKeyboardModeTooltipHook()
+    DebugLog("SetupKeyboardModeTooltipHook: Setting up keyboard mode tooltip hook")
 
-    -- Hook specifically into the inventory tooltip shown in your screenshot
-    ZO_PreHookHandler(ItemTooltip, "OnAddGameData", function(self, gameDataType, ...)
-        DebugLog("SetupInventoryTooltipHook: OnAddGameData triggered, type: " .. tostring(gameDataType))
+    -- For the main inventory tooltip
+    ZO_PreHook("ZO_Tooltip_AddItemTitle", function(tooltipControl, itemLink)
+        DebugLog("SetupKeyboardModeTooltipHook: ZO_Tooltip_AddItemTitle called for " .. tostring(itemLink))
 
-        -- We need to get the item info from the tooltip's current item
-        if not self.lastItemLink then return false end
+        -- Store for later use when other tooltip functions are called
+        if tooltipControl and itemLink then
+            tooltipControl.TSCLastItemLink = itemLink
+        end
+        return false
+    end)
 
-        local itemLink = self.lastItemLink
-        DebugLog("SetupInventoryTooltipHook: Item Link: " .. tostring(itemLink))
+    -- Hook directly into the description section to append our price at the end
+    ZO_PreHook("ZO_Tooltip_AddItemDescription", function(tooltipControl, itemLink)
+        DebugLog("SetupKeyboardModeTooltipHook: ZO_Tooltip_AddItemDescription called")
 
-        -- Only add our price at the end of the tooltip
-        -- TOOLTIP_GAME_DATA_DESCRIPTION is when description is added, which is usually last
-        if gameDataType == TOOLTIP_GAME_DATA_DESCRIPTION then
+        -- Use saved itemLink if not provided directly
+        itemLink = itemLink or (tooltipControl and tooltipControl.TSCLastItemLink)
+
+        if itemLink then
+            DebugLog("SetupKeyboardModeTooltipHook: Item Link: " .. tostring(itemLink))
             local itemId = GetItemLinkItemId(itemLink)
-            DebugLog("SetupInventoryTooltipHook: Item ID: " .. tostring(itemId))
 
             if itemId and itemId > 0 then
                 local price = LookupPrice(itemId, itemLink)
-                DebugLog("SetupInventoryTooltipHook: Price: " .. tostring(price))
+                DebugLog("SetupKeyboardModeTooltipHook: Price for " .. itemId .. ": " .. tostring(price))
+
                 if price and price > 0 then
-                    -- Add custom TSC price line
-                    self:AddLine("")
-                    self:AddLine("TSC Price: " .. FormatPrice(price) .. "g", "ZoFontGame", 1, 0.9, 0)
-                    DebugLog("SetupInventoryTooltipHook: Added price line")
+                    -- Create separate section for our price
+                    tooltipControl:AddVerticalPadding(8)
+                    ZO_Tooltip_AddDivider(tooltipControl)
+                    tooltipControl:AddVerticalPadding(8)
+
+                    -- Add our custom price line (using gold color)
+                    tooltipControl:AddLine("|cFFD700TSC Price:|r " .. FormatPrice(price) .. "g", "", 1, 1, 1)
+                    DebugLog("SetupKeyboardModeTooltipHook: Added price to tooltip")
                 end
             end
         end
@@ -158,32 +169,24 @@ function SetupInventoryTooltipHook()
         return false
     end)
 
-    -- Store item link when SetBagItem is called so we can use it later
-    ZO_PreHook(ItemTooltip, "SetBagItem", function(self, bagId, slotIndex)
-        DebugLog("SetupInventoryTooltipHook: SetBagItem called")
-        local itemLink = GetItemLink(bagId, slotIndex)
-        self.lastItemLink = itemLink
-        DebugLog("SetupInventoryTooltipHook: Stored item link: " .. tostring(itemLink))
-        return false
-    end)
-
-    -- Also store link directly when SetLink is called
-    ZO_PreHook(ItemTooltip, "SetLink", function(self, itemLink)
-        DebugLog("SetupInventoryTooltipHook: SetLink called")
-        self.lastItemLink = itemLink
-        DebugLog("SetupInventoryTooltipHook: Stored item link: " .. tostring(itemLink))
-        return false
-    end)
-
-    DebugLog("SetupInventoryTooltipHook: Inventory tooltip hook set up")
+    DebugLog("SetupKeyboardModeTooltipHook: Keyboard mode tooltip hook set up")
 end
 
--- Master function to setup all tooltip hooks
+-- Update master hook function
 function SetupAllHooks()
     DebugLog("SetupAllHooks: Setting up all hooks")
-    SetupBagItemTooltipHook()
-    SetupItemLinkTooltipHook()
-    SetupInventoryTooltipHook()
+
+    -- Handle different UI modes appropriately
+    if IsInGamepadPreferredMode() then
+        DebugLog("SetupAllHooks: Setting up gamepad mode hooks")
+        SetupBagItemTooltipHook()
+        SetupItemLinkTooltipHook()
+    else
+        DebugLog("SetupAllHooks: Setting up keyboard mode hooks")
+        SetupKeyboardModeTooltipHook()
+    end
+
+    -- Always set up inventory hooks
     SetupInventoryHooks()
     DebugLog("SetupAllHooks: All hooks set up")
 end
@@ -540,6 +543,24 @@ function TestInventoryTooltip()
     return itemTooltipExists or popupTooltipExists
 end
 
+-- Tests keyboard tooltip hooks
+function TestKeyboardTooltip()
+    DebugLog("TestKeyboardTooltip: Testing keyboard tooltip hooks")
+
+    -- Check if we're in keyboard mode
+    local isKeyboardMode = not IsInGamepadPreferredMode()
+    DebugLog("TestKeyboardTooltip: Keyboard mode: " .. tostring(isKeyboardMode))
+    d("|c88FFFFKeyboard Mode:|r " .. tostring(isKeyboardMode))
+
+    -- Check if tooltip functions exist
+    local tooltipFunctionsExist = type(ZO_Tooltip_AddItemTitle) == "function" and
+        type(ZO_Tooltip_AddItemDescription) == "function"
+
+    d("|c88FFFFKeyboard Tooltip Test:|r Functions exist: " .. tostring(tooltipFunctionsExist))
+
+    return isKeyboardMode and tooltipFunctionsExist
+end
+
 -- Master testing function that runs all tests
 function TestSuite()
     DebugLog("TestSuite: Beginning all tests")
@@ -551,7 +572,8 @@ function TestSuite()
         nameData = TestPriceNameDataLookup(),
         dataStructures = TestDataStructures(),
         gamepadUI = TestGamepadUI(),
-        inventoryTooltip = TestInventoryTooltip()
+        inventoryTooltip = TestInventoryTooltip(),
+        keyboardTooltip = TestKeyboardTooltip()
     }
 
     -- Display summary
@@ -564,8 +586,12 @@ function TestSuite()
     d("|c" ..
         (results.inventoryTooltip and "88FF88" or "FF8888") ..
         "Inventory Tooltip UI:|r " .. tostring(results.inventoryTooltip))
+    d("|c" ..
+        (results.keyboardTooltip and "88FF88" or "FF8888") ..
+        "Keyboard Tooltip UI:|r " .. tostring(results.keyboardTooltip))
 
-    local allPassed = results.priceData and results.nameData and results.dataStructures
+    local allPassed = results.priceData and results.nameData and results.dataStructures and results.gamepadUI and
+        results.inventoryTooltip and results.keyboardTooltip
     local uiWarning = not results.gamepadUI and "WARNING: Gamepad UI not available - tooltips will not work!" or ""
 
     d("|c" .. (allPassed and "88FF88" or "FF8888") .. "Overall Result:|r " .. (allPassed and "PASS" or "FAIL") ..
