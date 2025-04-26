@@ -77,8 +77,13 @@ end
 
 -- Hook into item tooltips for bag items (inventory, bank, etc.)
 function SetupBagItemTooltipHook()
+    DebugLog("SetupBagItemTooltipHook: Setting up bag item tooltip hook")
     ZO_PreHook(GAMEPAD_TOOLTIPS:GetTooltip(GAMEPAD_LEFT_TOOLTIP), "SetBagItem", function(self, bagId, slotIndex)
-        if not TSCPriceFetcher.settings.showTooltips then return false end
+        DebugLog("SetupBagItemTooltipHook: Bag ID: " .. tostring(bagId) .. " Slot Index: " .. tostring(slotIndex))
+        if not TSCPriceFetcher.settings.showTooltips then
+            DebugLog("SetupBagItemTooltipHook: Exiting early - tooltips disabled")
+            return false
+        end
 
         local itemId = GetItemId(bagId, slotIndex)
         DebugLog("SetupBagItemTooltipHook: Item ID: " .. tostring(itemId))
@@ -95,8 +100,13 @@ end
 
 -- Hook into item tooltips for item links (chat, quest rewards, etc.)
 function SetupItemLinkTooltipHook()
+    DebugLog("SetupItemLinkTooltipHook: Setting up item link tooltip hook")
     ZO_PreHook(GAMEPAD_TOOLTIPS:GetTooltip(GAMEPAD_LEFT_TOOLTIP), "SetLink", function(self, itemLink)
-        if not TSCPriceFetcher.settings.showTooltips then return false end
+        DebugLog("SetupItemLinkTooltipHook: Item Link: " .. tostring(itemLink))
+        if not TSCPriceFetcher.settings.showTooltips then
+            DebugLog("SetupItemLinkTooltipHook: Exiting early - tooltips disabled")
+            return false
+        end
 
         local itemId = GetItemLinkItemId(itemLink)
         DebugLog("SetupItemLinkTooltipHook: Item ID: " .. tostring(itemId))
@@ -116,13 +126,16 @@ function SetupTooltipHooks()
     DebugLog("SetupTooltipHooks: Setting up hooks")
     SetupBagItemTooltipHook()
     SetupItemLinkTooltipHook()
-    DebugLog("SetupTooltipHooks: Hooks set up")
+    DebugLog("SetupTooltipHooks: All hooks set up")
 end
 
 -- Hook into inventory item display to show prices
 function SetupInventoryHooks()
-    DebugLog("SetupInventoryHooks: Setting up hooks")
-    if not TSCPriceFetcher.settings.showInInventory then return end
+    DebugLog("SetupInventoryHooks: Setting up inventory hook")
+    if not TSCPriceFetcher.settings.showInInventory then
+        DebugLog("SetupInventoryHooks: Exiting early - inventory not shown")
+        return
+    end
 
     -- Only implement the gamepad inventory hook
     ---@diagnostic disable-next-line: param-type-mismatch
