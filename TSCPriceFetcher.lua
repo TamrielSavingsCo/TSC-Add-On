@@ -34,30 +34,19 @@ end
 -- Main Addon Functions
 -------------------------------
 
--- Function to look up a price based on itemId
-function LookupPrice(itemId, itemLink)
-    DebugLog("LookupPrice: " .. tostring(itemId) .. " " .. tostring(itemLink))
-    -- Direct ID lookup for most items
-    if TSCPriceData[itemId] then
-        DebugLog("LookupPrice: Found price for itemId " .. tostring(itemId))
-        return TSCPriceData[itemId].price
+-- Function to look up a price based on item name
+function LookupPrice(itemLink)
+    DebugLog("LookupPrice: Looking up price for " .. tostring(itemLink))
+
+    -- Get the item name from the link
+    local itemName = GetItemLinkName(itemLink)
+    DebugLog("LookupPrice: Item name: " .. tostring(itemName))
+
+    if itemName and TSCPriceNameData[itemName] then
+        DebugLog("LookupPrice: Found price for itemName " .. tostring(itemName))
+        return TSCPriceNameData[itemName].price
     end
 
-    -- Only check type if we need to
-    local itemType = GetItemLinkItemType(itemLink or
-        ("|H1:item:" .. itemId .. ":0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h|h"))
-    DebugLog("LookupPrice: Item type: " .. tostring(itemType))
-    -- Name lookup only for gear items
-    ---@diagnostic disable-next-line: undefined-global
-    if itemType == ITEMTYPE_ARMOR or itemType == ITEMTYPE_WEAPON or itemType == ITEMTYPE_JEWELRY then
-        local itemName = GetItemLinkName(itemLink or
-            ("|H1:item:" .. itemId .. ":0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h|h"))
-        DebugLog("LookupPrice: Item name: " .. tostring(itemName))
-        if itemName and TSCPriceNameData[itemName] then
-            DebugLog("LookupPrice: Found price for itemName " .. tostring(itemName))
-            return TSCPriceNameData[itemName].price
-        end
-    end
     DebugLog("LookupPrice: No price found, returning 0")
     return 0
 end
@@ -75,98 +64,58 @@ function FormatPrice(price)
     return formatted
 end
 
--- Hook into item tooltips for bag items (inventory, bank, etc.)
+-- Hook into item tooltips for bag items
 function SetupBagItemTooltipHook()
     DebugLog("SetupBagItemTooltipHook: Setting up bag item tooltip hook")
     ZO_PreHook(GAMEPAD_TOOLTIPS:GetTooltip(GAMEPAD_LEFT_TOOLTIP), "SetBagItem", function(self, bagId, slotIndex)
         DebugLog("SetupBagItemTooltipHook: Bag ID: " .. tostring(bagId) .. " Slot Index: " .. tostring(slotIndex))
-        if not TSCPriceFetcher.settings.showTooltips then
-            DebugLog("SetupBagItemTooltipHook: Exiting early - tooltips disabled")
-            return false
-        end
+        if not TSCPriceFetcher.settings.showTooltips then return false end
 
-        local itemId = GetItemId(bagId, slotIndex)
-        DebugLog("SetupBagItemTooltipHook: Item ID: " .. tostring(itemId))
-        if itemId and itemId > 0 then
-            local price = LookupPrice(itemId)
-            DebugLog("SetupBagItemTooltipHook: Price: " .. tostring(price))
+        local itemLink = GetItemLink(bagId, slotIndex)
+        if itemLink then
+            local price = LookupPrice(itemLink)
             if price and price > 0 then
                 self:AddLine(zo_strformat("TSC Price: <<1>>g", FormatPrice(price)))
             end
         end
         return false
     end)
-    DebugLog("SetupBagItemTooltipHook: Bag item tooltip hook set up")
 end
 
--- Hook into item tooltips for item links (chat, quest rewards, etc.)
+-- Hook into item tooltips for item links
 function SetupItemLinkTooltipHook()
     DebugLog("SetupItemLinkTooltipHook: Setting up item link tooltip hook")
     ZO_PreHook(GAMEPAD_TOOLTIPS:GetTooltip(GAMEPAD_LEFT_TOOLTIP), "SetLink", function(self, itemLink)
-        DebugLog("SetupItemLinkTooltipHook: Item Link: " .. tostring(itemLink))
-        if not TSCPriceFetcher.settings.showTooltips then
-            DebugLog("SetupItemLinkTooltipHook: Exiting early - tooltips disabled")
-            return false
-        end
+        if not TSCPriceFetcher.settings.showTooltips then return false end
 
-        local itemId = GetItemLinkItemId(itemLink)
-        DebugLog("SetupItemLinkTooltipHook: Item ID: " .. tostring(itemId))
-        if itemId and itemId > 0 then
-            local price = LookupPrice(itemId, itemLink)
-            DebugLog("SetupItemLinkTooltipHook: Price: " .. tostring(price))
+        if itemLink then
+            local price = LookupPrice(itemLink)
             if price and price > 0 then
                 self:AddLine(zo_strformat("TSC Price: <<1>>g", FormatPrice(price)))
             end
         end
         return false
     end)
-    DebugLog("SetupItemLinkTooltipHook: Item link tooltip hook set up")
 end
 
--- Hook into chat item links to modify messages and include prices inline
+-- Hook into chat item links
 function SetupChatLinkHook()
-    DebugLog("SetupChatLinkHook: Setting up chat link hook")
-
-    -- Hook into the chat processor that formats messages for display
     local originalFormatMessage = CHAT_ROUTER.FormatMessage
     CHAT_ROUTER.FormatMessage = function(self, channelInfo, from, text, isFromCustomerService, fromDisplayName)
-        DebugLog("SetupChatLinkHook: Processing chat message: " .. tostring(text))
-
-        -- Process messages containing item links
         if text and text:find("|H1:item:") then
-            -- Create a new text string with prices
             local newText = text
-
-            -- Find all item links and add prices
             for link in string.gmatch(text, "|H1:item:[^|]+|h[^|]+|h") do
-                DebugLog("SetupChatLinkHook: Found item link: " .. tostring(link))
-                local itemId = GetItemLinkItemId(link)
-
-                -- Only process links with valid item IDs
-                if itemId and itemId > 0 then
-                    -- Look up the price
-                    local price = LookupPrice(itemId, link)
-                    if price and price > 0 then
-                        -- Create a replacement that includes the price
-                        local originalLink = link
-                        local modifiedLink = link .. " |cFFD700[" .. FormatPrice(price) .. "g]|r"
-
-                        -- Replace the original link with the modified one
-                        newText = newText:gsub(originalLink, modifiedLink, 1)
-                        DebugLog("SetupChatLinkHook: Added price for item ID " .. tostring(itemId))
-                    end
+                local price = LookupPrice(link)
+                if price and price > 0 then
+                    local originalLink = link
+                    local modifiedLink = link .. " |cFFD700[" .. FormatPrice(price) .. "g]|r"
+                    newText = newText:gsub(originalLink, modifiedLink, 1)
                 end
             end
-
-            -- Use the modified text instead of the original
             text = newText
         end
-
-        -- Call the original function with our modified text
         return originalFormatMessage(self, channelInfo, from, text, isFromCustomerService, fromDisplayName)
     end
-
-    DebugLog("SetupChatLinkHook: Chat link hook set up")
 end
 
 -- Update master hook function
@@ -205,12 +154,10 @@ function SetupInventoryHooks()
         DebugLog("SetupInventoryHooks: Bag ID: " .. tostring(bagId) .. " Slot Index: " .. tostring(slotIndex))
         if not bagId or not slotIndex then return false end
 
-        local itemId = GetItemId(bagId, slotIndex)
-        DebugLog("SetupInventoryHooks: Item ID: " .. tostring(itemId))
-        if not itemId or itemId <= 0 then return false end
+        local itemLink = GetItemLink(bagId, slotIndex)
+        if not itemLink then return false end
 
-        local price = LookupPrice(itemId)
-        DebugLog("SetupInventoryHooks: Price: " .. tostring(price))
+        local price = LookupPrice(itemLink)
         if price and price > 0 then
             -- Find the label in gamepad UI
             local nameControl = control:GetNamedChild("Name")
@@ -418,28 +365,17 @@ EVENT_MANAGER:RegisterForEvent(TSCPriceFetcher.name, EVENT_ADD_ON_LOADED, OnAddO
 -- TESTING UTILITY FUNCTIONS
 -----------------------------------------------------------------
 
--- Tests basic price data lookup by ID
+-- Tests basic price data lookup
 function TestPriceDataLookup()
-    DebugLog("TestPriceDataLookup: Testing item ID lookup")
+    DebugLog("TestPriceDataLookup: Testing item lookup")
 
-    -- Test specific item by ID
-    local testItemId = 34349 -- Acai Berry
+    -- Test specific item by link
+    local testItemLink = "|H1:item:34349:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h[Acai Berry]|h"
 
-    -- Look up the price directly
-    local price = LookupPrice(testItemId)
-    DebugLog("TestPriceDataLookup: Price lookup for Acai Berry (ID: " .. testItemId .. "): " .. tostring(price))
-    d("|c88FFFFPrice Test:|r Acai Berry (ID: " .. testItemId .. ") price: " .. tostring(price or "not found"))
-
-    -- If price data is missing, add it for testing
-    if not price or price <= 0 then
-        if not TSCPriceData then TSCPriceData = {} end
-        TSCPriceData[testItemId] = { price = 123 }
-        d("|cFFFF88Note:|r Created test price 123 for Acai Berry (ID: " .. testItemId .. ")")
-
-        -- Test lookup again
-        price = LookupPrice(testItemId)
-        d("|c88FFFFPrice Test:|r After adding data - Acai Berry price: " .. tostring(price or "still not found"))
-    end
+    -- Look up the price
+    local price = LookupPrice(testItemLink)
+    DebugLog("TestPriceDataLookup: Price lookup for Acai Berry: " .. tostring(price))
+    d("|c88FFFFPrice Test:|r Acai Berry price: " .. tostring(price or "not found"))
 
     return price and price > 0
 end
@@ -449,7 +385,7 @@ function TestPriceNameDataLookup()
     DebugLog("TestPriceNameDataLookup: Testing item name lookup")
 
     -- Test specific named item
-    local namedItemLink = "|H1:item:123456:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h[Abyssal Brace Gauntlets]|h"
+    local testItemLink = "|H1:item:123456:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h[Abyssal Brace Gauntlets]|h"
     local itemName = "Abyssal Brace Gauntlets"
 
     -- Test if TSCPriceNameData exists
@@ -464,12 +400,11 @@ function TestPriceNameDataLookup()
     d("|cFFFF88Note:|r Added test price 10000 for " .. itemName)
 
     -- Test name lookup through the regular function
-    local mockedItemLink = namedItemLink
-    local namePrice = LookupPrice(123456, mockedItemLink)
-    d("|c88FFFFPrice Test:|r " .. itemName .. " price: " .. tostring(namePrice or "not found"))
-    DebugLog("TestPriceNameDataLookup: Price lookup for " .. itemName .. ": " .. tostring(namePrice))
+    local price = LookupPrice(testItemLink)
+    d("|c88FFFFPrice Test:|r " .. itemName .. " price: " .. tostring(price or "not found"))
+    DebugLog("TestPriceNameDataLookup: Price lookup for " .. itemName .. ": " .. tostring(price))
 
-    return namePrice and namePrice > 0
+    return price and price > 0
 end
 
 -- Tests price data structure integrity
