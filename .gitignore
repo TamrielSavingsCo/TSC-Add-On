@@ -43,3 +43,5 @@ luac.out
 .DS_Store
 .vscode
 .vscode/*
+agent-instructions.txt
+agent-overview.txt
