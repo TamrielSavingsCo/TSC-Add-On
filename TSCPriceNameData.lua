@@ -16,11 +16,9 @@ TSCPriceNameData = {
     ["Mother's Sorrow Robe"] = { price = 35000 },
 
     -- Weapons
-    ["Mace of Truth"] = { price = 25000 },
-    ["Inferno Staff of the Seducer"] = { price = 18500 },
 
     -- Jewelry
-    ["Ring of the Worm Cult"] = { price = 45000 },
+
     -- Provisioning Materials
     ["Acai Berry"] = 123,
     ["Aetherial Dust"] = 123,
