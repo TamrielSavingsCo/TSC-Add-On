@@ -45,9 +45,5 @@ function Debug.error(msg)
     d(colorize("[TSC][ERROR] " .. msg, COLORS.ERROR))
 end
 
---[[
-    Return the Debug table so other files can use these functions.
-    Example: local Debug = require("modules/core/debug")
-]]
-DebugModule = Debug
+TSC_DebugModule = Debug
 return Debug

@@ -27,19 +27,16 @@ function Events.registerAll()
         end
     end)
 
-    -- **may not need this implementation**
-    -- local Tooltips = require("modules/ui/tooltips")
-    -- Events.register(EVENT_ITEM_TOOLTIP_SHOWN, Tooltips.OnTooltipShown)
-
-    local Tooltips = require("modules/ui/tooltips")
-    ZO_PreHook(ZO_ItemTooltip_SetBagItem, function(tooltipControl, bagId, slotIndex)
-        Tooltips.OnTooltipShown(nil, tooltipControl, nil, bagId, slotIndex)
-        return false
-    end)
+    if TSC_TooltipsModule then
+        ZO_PreHook(ZO_ItemTooltip_SetBagItem, function(tooltipControl, bagId, slotIndex)
+            TSC_TooltipsModule.OnTooltipShown(nil, tooltipControl, nil, bagId, slotIndex)
+            return false
+        end)
+    end
 
     -- Add more event registrations here as your addon grows
     TSCPriceFetcher.modules.debug.log("Events: All events registered")
 end
 
-EventsModule = Events
+TSC_EventsModule = Events
 return Events

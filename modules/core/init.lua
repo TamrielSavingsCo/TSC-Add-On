@@ -34,5 +34,5 @@ function Init.isReady()
 end
 
 -- Return the Init table so other files can use it
-InitModule = Init
+TSC_InitModule = Init
 return Init

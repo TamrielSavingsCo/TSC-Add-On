@@ -17,5 +17,5 @@ function Formatter.toGold(amount)
     return formatted
 end
 
-FormatterModule = Formatter
+TSC_FormatterModule = Formatter
 return Formatter

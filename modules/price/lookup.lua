@@ -1,8 +1,5 @@
-local raw = require("TSCPriceNameData")
-local data = raw.data
-local info = raw.info
-
-local Formatter = require("modules/price/format") -- Import the formatter
+local data = TSCPriceNameData
+local info = TSCPriceNameDataInfo
 
 local Lookup = {}
 
@@ -21,7 +18,11 @@ function Lookup.getFormattedPrice(itemName)
     local price = data[itemName]
     if price then
         TSCPriceFetcher.modules.debug.log("Lookup: Found price=" .. tostring(price))
-        return Formatter.toGold(price)
+        if TSC_FormatterModule then
+            return TSC_FormatterModule.toGold(price)
+        else
+            return tostring(price)
+        end
     end
     TSCPriceFetcher.modules.debug.warn("Lookup: No price data for itemName=" .. tostring(itemName))
     return "No price data"
@@ -44,5 +45,5 @@ function Lookup.getPrice(itemName)
     return data[itemName]
 end
 
-LookupModule = Lookup
+TSC_LookupModule = Lookup
 return Lookup

@@ -37,6 +37,7 @@ local function OnTooltipShown(eventCode, tooltipControl, itemLink, bagId, slotIn
     end
 end
 
-return {
+TSC_TooltipsModule = {
     OnTooltipShown = OnTooltipShown
 }
+return TSC_TooltipsModule
