@@ -8,6 +8,11 @@
     @param slotIndex (number|nil) - The slotIndex (if available)
 ]]
 local function OnTooltipShown(eventCode, tooltipControl, itemLink, bagId, slotIndex)
+    d("OnTooltipShown called: " ..
+        tostring(tooltipControl) .. ", " .. tostring(itemLink) .. ", " .. tostring(bagId) .. ", " .. tostring(slotIndex))
+    if tooltipControl and tooltipControl.GetName then
+        d("Tooltip control name: " .. tooltipControl:GetName())
+    end
     -- Try to get itemLink if not provided
     if not itemLink and bagId and slotIndex then
         itemLink = GetItemLink(bagId, slotIndex)
@@ -34,6 +39,11 @@ local function OnTooltipShown(eventCode, tooltipControl, itemLink, bagId, slotIn
         if TSCPriceFetcher and TSCPriceFetcher.modules and TSCPriceFetcher.modules.debug then
             TSCPriceFetcher.modules.debug.log("Tooltips: Added price to tooltip for " .. itemName)
         end
+        d("Item name: " .. tostring(itemName) .. ", priceString: " .. tostring(priceString))
+    end
+
+    if tooltipControl and tooltipControl.AddLine then
+        tooltipControl:AddLine("TEST LINE")
     end
 end
 
