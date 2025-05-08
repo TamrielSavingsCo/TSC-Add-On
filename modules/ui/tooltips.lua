@@ -29,13 +29,20 @@ local function OnTooltipShown(eventCode, tooltipControl, itemLink, bagId, slotIn
 
     local priceString = TSCPriceFetcher.modules.lookup.getFormattedPrice(itemName)
 
-    -- For gamepad tooltips, use the .tooltip property
-    if tooltipControl.tooltip and tooltipControl.tooltip.AddLine then
+    -- Check what tooltipControl.tooltip actually is
+    d("Type of tooltipControl.tooltip: " .. tostring(type(tooltipControl.tooltip)))
+    if type(tooltipControl.tooltip) == "table" and tooltipControl.tooltip.AddLine then
         tooltipControl.tooltip:AddLine("|cFFFF00Avg Price:|r " .. priceString .. " gold")
         tooltipControl.tooltip:AddLine("|cFF00FFTEST LINE: If you see this, AddLine works!|r")
         d("Added price line and TEST LINE to tooltipControl.tooltip")
+    elseif type(tooltipControl.tooltip) == "function" then
+        d("tooltipControl.tooltip is a function, not a control/table")
     else
         d("No AddLine method found on tooltipControl.tooltip")
+    end
+
+    for k, v in pairs(tooltipControl) do
+        d("tooltipControl key: " .. tostring(k) .. ", type: " .. type(v))
     end
 end
 
