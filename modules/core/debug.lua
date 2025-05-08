@@ -49,4 +49,5 @@ end
     Return the Debug table so other files can use these functions.
     Example: local Debug = require("modules/core/debug")
 ]]
+DebugModule = Debug
 return Debug

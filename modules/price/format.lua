@@ -17,4 +17,5 @@ function Formatter.toGold(amount)
     return formatted
 end
 
+FormatterModule = Formatter
 return Formatter

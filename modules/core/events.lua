@@ -41,4 +41,5 @@ function Events.registerAll()
     TSCPriceFetcher.modules.debug.log("Events: All events registered")
 end
 
+EventsModule = Events
 return Events

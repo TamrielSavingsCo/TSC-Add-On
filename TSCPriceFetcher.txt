@@ -11,3 +11,9 @@ TSCPriceNameData.lua
 
 # Then load the main addon
 TSCPriceFetcher.lua
+
+# Then load the module files
+modules/core/debug.lua
+modules/core/init.lua
+modules/core/events.lua
+modules/price/lookup.lua

@@ -44,4 +44,5 @@ function Lookup.getPrice(itemName)
     return data[itemName]
 end
 
+LookupModule = Lookup
 return Lookup
