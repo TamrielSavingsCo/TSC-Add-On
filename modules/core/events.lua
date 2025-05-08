@@ -31,23 +31,16 @@ local function registerPreHooks()
         TSCPriceFetcher.modules.debug.warn("ItemTooltip is nil")
     end
 
-    -- Debug log for ZO_ItemTooltip_SetBagItem
-    if ZO_ItemTooltip_SetBagItem then
-        TSCPriceFetcher.modules.debug.log("ZO_ItemTooltip_SetBagItem exists, type: " .. type(ZO_ItemTooltip_SetBagItem))
-    else
-        TSCPriceFetcher.modules.debug.warn("ZO_ItemTooltip_SetBagItem is nil")
-    end
-
-    -- Existing prehook logic
-    if TSC_TooltipsModule and ZO_ItemTooltip_SetBagItem then
-        ZO_PreHook(ZO_ItemTooltip_SetBagItem, function(tooltipControl, bagId, slotIndex)
+    -- Hook ItemTooltip:SetBagItem if available
+    if TSC_TooltipsModule and ItemTooltip and ItemTooltip.SetBagItem then
+        ZO_PreHook(ItemTooltip, "SetBagItem", function(tooltipControl, bagId, slotIndex)
             TSC_TooltipsModule.OnTooltipShown(nil, tooltipControl, nil, bagId, slotIndex)
             return false
         end)
-        TSCPriceFetcher.modules.debug.log("Events: PreHooks registered")
+        TSCPriceFetcher.modules.debug.log("Events: PreHooked ItemTooltip:SetBagItem")
     else
         TSCPriceFetcher.modules.debug.warn(
-            "Events: Could not register PreHooks (missing TooltipsModule or ZO_ItemTooltip_SetBagItem)")
+            "Events: Could not register PreHooks (missing TooltipsModule or ItemTooltip.SetBagItem)")
     end
 end
 
