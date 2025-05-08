@@ -29,20 +29,24 @@ local function OnTooltipShown(eventCode, tooltipControl, itemLink, bagId, slotIn
 
     local priceString = TSCPriceFetcher.modules.lookup.getFormattedPrice(itemName)
 
-    -- Check what tooltipControl.tooltip actually is
-    d("Type of tooltipControl.tooltip: " .. tostring(type(tooltipControl.tooltip)))
-    if type(tooltipControl.tooltip) == "table" and tooltipControl.tooltip.AddLine then
-        tooltipControl.tooltip:AddLine("|cFFFF00Avg Price:|r " .. priceString .. " gold")
-        tooltipControl.tooltip:AddLine("|cFF00FFTEST LINE: If you see this, AddLine works!|r")
-        d("Added price line and TEST LINE to tooltipControl.tooltip")
-    elseif type(tooltipControl.tooltip) == "function" then
-        d("tooltipControl.tooltip is a function, not a control/table")
+    -- Try to add to the left tooltip
+    local leftTooltip = tooltipControl.tooltips and tooltipControl.tooltips.GAMEPAD_LEFT_TOOLTIP
+    if leftTooltip and leftTooltip.AddLine then
+        leftTooltip:AddLine("|cFFFF00Avg Price:|r " .. priceString .. " gold")
+        leftTooltip:AddLine("|cFF00FFTEST LINE: If you see this, AddLine works!|r")
+        d("Added price line and TEST LINE to leftTooltip")
     else
-        d("No AddLine method found on tooltipControl.tooltip")
+        d("No AddLine method found on leftTooltip")
     end
 
-    for k, v in pairs(tooltipControl) do
-        d("tooltipControl key: " .. tostring(k) .. ", type: " .. type(v))
+    -- Debug: log all keys in tooltips
+    if type(tooltipControl.tooltips) == "table" then
+        for k, v in pairs(tooltipControl.tooltips) do
+            d("tooltips key: " .. tostring(k) .. ", type: " .. type(v))
+            if type(v) == "userdata" and v.AddLine then
+                d("tooltips[" .. tostring(k) .. "] has AddLine")
+            end
+        end
     end
 end
 
