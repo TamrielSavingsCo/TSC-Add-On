@@ -19,31 +19,27 @@ local function OnTooltipShown(eventCode, tooltipControl, itemLink, bagId, slotIn
     end
 
     if not itemLink or not tooltipControl then
-        if TSCPriceFetcher and TSCPriceFetcher.modules and TSCPriceFetcher.modules.debug then
-            TSCPriceFetcher.modules.debug.warn("Tooltips: Missing itemLink or tooltipControl")
-        end
+        d("Tooltips: Missing itemLink or tooltipControl")
         return
     end
 
     local itemName = GetItemLinkName(itemLink)
     if not itemName then
-        if TSCPriceFetcher and TSCPriceFetcher.modules and TSCPriceFetcher.modules.debug then
-            TSCPriceFetcher.modules.debug.warn("Tooltips: Could not get item name from itemLink: " .. tostring(itemLink))
-        end
+        d("Tooltips: Could not get item name from itemLink: " .. tostring(itemLink))
         return
     end
 
     local priceString = TSCPriceFetcher.modules.lookup.getFormattedPrice(itemName)
-    if priceString then
+    if tooltipControl.AddLine then
         tooltipControl:AddLine("|cFFFF00Avg Price:|r " .. priceString .. " gold")
-        if TSCPriceFetcher and TSCPriceFetcher.modules and TSCPriceFetcher.modules.debug then
-            TSCPriceFetcher.modules.debug.log("Tooltips: Added price to tooltip for " .. itemName)
-        end
-        d("Item name: " .. tostring(itemName) .. ", priceString: " .. tostring(priceString))
-    end
-
-    if tooltipControl and tooltipControl.AddLine then
-        tooltipControl:AddLine("TEST LINE")
+        tooltipControl:AddLine("|cFF00FFTEST LINE: If you see this, AddLine works!|r")
+        d("Added price line and TEST LINE to tooltipControl")
+    elseif tooltipControl.control and tooltipControl.control.AddLine then
+        tooltipControl.control:AddLine("|cFFFF00Avg Price:|r " .. priceString .. " gold")
+        tooltipControl.control:AddLine("|cFF00FFTEST LINE: If you see this, AddLine works!|r")
+        d("Added price line and TEST LINE to tooltipControl.control")
+    else
+        d("No AddLine method found on tooltipControl or tooltipControl.control")
     end
 end
 

@@ -42,6 +42,14 @@ local function registerPreHooks()
         TSCPriceFetcher.modules.debug.warn(
             "Events: Could not register PreHooks (missing TooltipsModule or ItemTooltip.SetBagItem)")
     end
+
+    if GAMEPAD_TOOLTIPS and GAMEPAD_TOOLTIPS.layoutFunctions then
+        ZO_PreHook(GAMEPAD_TOOLTIPS, "LayoutBagItem", function(self, tooltipType, bagId, slotIndex, ...)
+            TSC_TooltipsModule.OnTooltipShown(nil, self, nil, bagId, slotIndex)
+            return false
+        end)
+        TSCPriceFetcher.modules.debug.log("Events: PreHooked GAMEPAD_TOOLTIPS:LayoutBagItem")
+    end
 end
 
 -- Register all events needed for your addon
