@@ -12,8 +12,6 @@ TSCPriceNameDataInfo = {
 -- This table contains price data for gear items (weapons, armor, jewelry)
 TSCPriceNameData = {
     -- Armor
-    ["Abyssal Brace Gauntlets"] = { price = 10000 },
-    ["Mother's Sorrow Robe"] = { price = 35000 },
 
     -- Weapons
 
