@@ -33,14 +33,19 @@ end
 
 -- Register all events needed for your addon
 function Events.registerAll()
+    d("Events.registerAll called") -- Log entry into the function
+
     Events.register(EVENT_ADD_ON_LOADED, function(event, addonName)
+        d("EVENT_ADD_ON_LOADED handler fired: " .. tostring(addonName))
         if addonName == TSCPriceFetcher.name then
+            d("EVENT_ADD_ON_LOADED for our addon: " .. tostring(addonName))
             TSCPriceFetcher.modules.init.initialize()
             registerPreHooks()
             Events.unregister(EVENT_ADD_ON_LOADED)
         end
     end)
 
+    d("Events: All events registered (end of registerAll)")
     TSCPriceFetcher.modules.debug.log("Events: All events registered")
 end
 

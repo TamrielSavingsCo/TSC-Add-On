@@ -1,3 +1,4 @@
+d("TSC Debug loaded")
 local Debug = {}
 
 --[[

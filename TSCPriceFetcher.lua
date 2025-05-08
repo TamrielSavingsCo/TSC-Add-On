@@ -1,3 +1,4 @@
+d("TSCPriceFetcher.lua loaded")
 -- main.lua
 local TSCPriceFetcher = {
     name = "TSCPriceFetcher",
