@@ -26,6 +26,12 @@ local function registerPreHooks()
         end)
         TSCPriceFetcher.modules.debug.log("Events: PreHooks registered")
     else
+        if not TSC_TooltipsModule then
+            d("DEBUG: TSC_TooltipsModule is nil")
+        end
+        if not ZO_ItemTooltip_SetBagItem then
+            d("DEBUG: ZO_ItemTooltip_SetBagItem is nil")
+        end
         TSCPriceFetcher.modules.debug.warn(
             "Events: Could not register PreHooks (missing TooltipsModule or ZO_ItemTooltip_SetBagItem)")
     end
