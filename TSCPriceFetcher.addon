@@ -9,9 +9,6 @@
 # Load price data first
 TSCPriceNameData.lua
 
-# Then load the main addon
-TSCPriceFetcher.lua
-
 # Then load the module files
 modules/core/debug.lua
 modules/core/init.lua
@@ -19,3 +16,6 @@ modules/core/events.lua
 modules/price/format.lua
 modules/price/lookup.lua
 modules/ui/tooltips.lua
+
+# Then load the main addon
+TSCPriceFetcher.lua
