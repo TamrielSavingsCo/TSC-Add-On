@@ -10,9 +10,7 @@
 local function OnTooltipShown(eventCode, tooltipControl, itemLink, bagId, slotIndex)
     d("OnTooltipShown called: " ..
         tostring(tooltipControl) .. ", " .. tostring(itemLink) .. ", " .. tostring(bagId) .. ", " .. tostring(slotIndex))
-    if tooltipControl and tooltipControl.GetName then
-        d("Tooltip control name: " .. tooltipControl:GetName())
-    end
+
     -- Try to get itemLink if not provided
     if not itemLink and bagId and slotIndex then
         itemLink = GetItemLink(bagId, slotIndex)
@@ -30,16 +28,14 @@ local function OnTooltipShown(eventCode, tooltipControl, itemLink, bagId, slotIn
     end
 
     local priceString = TSCPriceFetcher.modules.lookup.getFormattedPrice(itemName)
-    if tooltipControl.AddLine then
-        tooltipControl:AddLine("|cFFFF00Avg Price:|r " .. priceString .. " gold")
-        tooltipControl:AddLine("|cFF00FFTEST LINE: If you see this, AddLine works!|r")
-        d("Added price line and TEST LINE to tooltipControl")
-    elseif tooltipControl.control and tooltipControl.control.AddLine then
-        tooltipControl.control:AddLine("|cFFFF00Avg Price:|r " .. priceString .. " gold")
-        tooltipControl.control:AddLine("|cFF00FFTEST LINE: If you see this, AddLine works!|r")
-        d("Added price line and TEST LINE to tooltipControl.control")
+
+    -- For gamepad tooltips, use the .tooltip property
+    if tooltipControl.tooltip and tooltipControl.tooltip.AddLine then
+        tooltipControl.tooltip:AddLine("|cFFFF00Avg Price:|r " .. priceString .. " gold")
+        tooltipControl.tooltip:AddLine("|cFF00FFTEST LINE: If you see this, AddLine works!|r")
+        d("Added price line and TEST LINE to tooltipControl.tooltip")
     else
-        d("No AddLine method found on tooltipControl or tooltipControl.control")
+        d("No AddLine method found on tooltipControl.tooltip")
     end
 end
 
