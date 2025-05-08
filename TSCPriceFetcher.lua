@@ -12,6 +12,7 @@ _G.TSCPriceFetcher = TSCPriceFetcher
 TSCPriceFetcher.modules.debug = require("modules/core/debug")
 TSCPriceFetcher.modules.init = require("modules/core/init")
 TSCPriceFetcher.modules.events = require("modules/core/events")
+d("DEBUG: events module is " .. tostring(TSCPriceFetcher.modules.events))
 TSCPriceFetcher.modules.events.registerAll()
 
 -- Then business logic
