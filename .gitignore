@@ -45,3 +45,6 @@ luac.out
 .vscode/*
 agent-instructions.txt
 agent-overview.txt
+
+/z_development
+/z_development/*

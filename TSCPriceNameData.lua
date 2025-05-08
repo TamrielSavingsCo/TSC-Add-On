@@ -57,3 +57,8 @@ TSCPriceNameData = {
     ["Millet"] = 123,
     ["Mint"] = 123,
 }
+
+return {
+    info = TSCPriceNameDataInfo,
+    data = TSCPriceNameData
+}
