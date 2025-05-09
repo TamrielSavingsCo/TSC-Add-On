@@ -13,7 +13,6 @@ _G.TSCPriceFetcher = TSCPriceFetcher
 TSCPriceFetcher.modules.debug = TSC_DebugModule
 TSCPriceFetcher.modules.init = TSC_InitModule
 TSCPriceFetcher.modules.events = TSC_EventsModule
-d("DEBUG: events module is " .. tostring(TSCPriceFetcher.modules.events))
 TSCPriceFetcher.modules.events.registerAll()
 
 -- Then business logic

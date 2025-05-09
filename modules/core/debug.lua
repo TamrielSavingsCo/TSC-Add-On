@@ -7,9 +7,10 @@ local Debug = {}
     We'll use different colors for info, warnings, and errors.
 ]]
 local COLORS = {
-    INFO = "FFFFFF",  -- White for normal info messages
-    WARN = "FFFF00",  -- Yellow for warnings
-    ERROR = "FF0000", -- Red for errors
+    INFO = "FFFFFF",    -- White for normal info messages
+    WARN = "FFFF00",    -- Yellow for warnings
+    ERROR = "FF0000",   -- Red for errors
+    SUCCESS = "00FF00", -- Green for initialization steps
 }
 
 --[[
@@ -44,6 +45,14 @@ end
 ]]
 function Debug.error(msg)
     d(colorize("[TSC][ERROR] " .. msg, COLORS.ERROR))
+end
+
+--[[
+    Log a success message to the chat (green).
+    Usage: Debug.success("Addon initialization started")
+]]
+function Debug.success(msg)
+    d(colorize("[TSC][SUCCESS] " .. msg, COLORS.SUCCESS))
 end
 
 TSC_DebugModule = Debug

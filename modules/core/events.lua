@@ -19,42 +19,32 @@ function Events.unregister(event)
 end
 
 local function registerPreHooks()
-    -- Debug log for ItemTooltip.SetBagItem
-    if ItemTooltip then
-        TSCPriceFetcher.modules.debug.log("ItemTooltip exists, type: " .. type(ItemTooltip))
-        if ItemTooltip.SetBagItem then
-            TSCPriceFetcher.modules.debug.log("ItemTooltip.SetBagItem exists, type: " .. type(ItemTooltip.SetBagItem))
-        else
-            TSCPriceFetcher.modules.debug.warn("ItemTooltip.SetBagItem is nil")
-        end
-    else
-        TSCPriceFetcher.modules.debug.warn("ItemTooltip is nil")
-    end
-
     -- Hook ItemTooltip:SetBagItem if available
     if TSC_TooltipsModule and ItemTooltip and ItemTooltip.SetBagItem then
+        TSCPriceFetcher.modules.debug.log("PreHooking ItemTooltip:SetBagItem")
         ZO_PreHook(ItemTooltip, "SetBagItem", function(tooltipControl, bagId, slotIndex)
             TSC_TooltipsModule.OnTooltipShown(nil, tooltipControl, nil, bagId, slotIndex)
             return false
         end)
-        TSCPriceFetcher.modules.debug.log("Events: PreHooked ItemTooltip:SetBagItem")
+        TSCPriceFetcher.modules.debug.success("Successfully PreHooked ItemTooltip:SetBagItem")
     else
         TSCPriceFetcher.modules.debug.warn(
-            "Events: Could not register PreHooks (missing TooltipsModule or ItemTooltip.SetBagItem)")
+            "Events: Could not register PreHooks")
     end
 
     if GAMEPAD_TOOLTIPS and GAMEPAD_TOOLTIPS.layoutFunctions then
+        TSCPriceFetcher.modules.debug.log("PreHooking GAMEPAD_TOOLTIPS:LayoutBagItem")
         ZO_PreHook(GAMEPAD_TOOLTIPS, "LayoutBagItem", function(self, tooltipType, bagId, slotIndex, ...)
             TSC_TooltipsModule.OnTooltipShown(nil, self, nil, bagId, slotIndex)
             return false
         end)
-        TSCPriceFetcher.modules.debug.log("Events: PreHooked GAMEPAD_TOOLTIPS:LayoutBagItem")
+        TSCPriceFetcher.modules.debug.success("Successfully PreHooked GAMEPAD_TOOLTIPS:LayoutBagItem")
     end
 end
 
 -- Register all events needed for your addon
 function Events.registerAll()
-    d("Events.registerAll called") -- Log entry into the function
+    TSCPriceFetcher.modules.debug.log("Registering all events")
 
     Events.register(EVENT_ADD_ON_LOADED, function(event, addonName)
         if addonName == TSCPriceFetcher.name then
@@ -68,8 +58,8 @@ function Events.registerAll()
         Events.unregister(EVENT_PLAYER_ACTIVATED)
     end)
 
-    d("Events: All events registered (end of registerAll)")
-    TSCPriceFetcher.modules.debug.log("Events: All events registered")
+
+    TSCPriceFetcher.modules.debug.success("Successfully registered all events")
 end
 
 TSC_EventsModule = Events
