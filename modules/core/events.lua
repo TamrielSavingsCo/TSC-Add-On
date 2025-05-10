@@ -1,4 +1,11 @@
 ---@diagnostic disable: undefined-global
+
+--[[
+    modules/core/events.lua
+    Handles event registration and unregistration for the addon.
+    Exposes: register, unregister, registerAll
+]]
+
 local Events = {}
 
 -- Table to keep track of registered events and their handlers
