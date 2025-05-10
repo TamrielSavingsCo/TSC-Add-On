@@ -14,8 +14,7 @@ function Init.initialize()
     TSCPriceFetcher.modules.debug.success("Init: Addon initialized")
 
     local function HookGamepadTooltips()
-        -- Instead of hooking the tooltip system directly, hook into 
-        -- the inventory system's UpdateItemLeftTooltip function
+        -- Hook inventory item tooltips - this is the most reliable hook
         SecurePostHook(ZO_GamepadInventory, "UpdateItemLeftTooltip", function(self, selectedData)
             -- Only add price data when there's a selected item
             if not selectedData then return end
@@ -31,34 +30,12 @@ function Init.initialize()
             local itemName = GetItemLinkName(itemLink)
             if not itemName or itemName == "" then return end
             
-            TSCPriceFetcher.modules.debug.log("Adding price for item: " .. itemName)
-            
             -- Get the left tooltip object that was just updated by the base function
             local tooltipObject = GAMEPAD_TOOLTIPS
-            local tooltip = tooltipObject:GetTooltip(GAMEPAD_LEFT_TOOLTIP)
+            local tooltipType = GAMEPAD_LEFT_TOOLTIP
             
-            if not tooltip then
-                TSCPriceFetcher.modules.debug.error("Tooltip object not found")
-                return
-            end
-            
-            -- Look up the price
-            local priceString = TSCPriceFetcher.modules.lookup.getFormattedPrice(itemName)
-            if not priceString then return end
-            
-            -- Add a slight delay to ensure we add our data after the tooltip is fully populated
-            zo_callLater(function()
-                local success, result = pcall(function()
-                    local priceSection = tooltip:AcquireSection(tooltip:GetStyle("bodySection"))
-                    priceSection:AddLine("Tamriel Savings Co: " .. priceString, tooltip:GetStyle("bodyDescription"))
-                    tooltip:AddSection(priceSection)
-                    return true
-                end)
-                
-                if not success then
-                    TSCPriceFetcher.modules.debug.error("Failed to add price to tooltip: " .. tostring(result))
-                end
-            end, 50) -- 50ms delay
+            -- Use our throttled tooltip function to add the price
+            TSCPriceFetcher.modules.tooltips.AddPriceToGamepadTooltip(tooltipObject, tooltipType, itemLink)
         end)
     end
 
