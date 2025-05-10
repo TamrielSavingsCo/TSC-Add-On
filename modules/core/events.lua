@@ -18,20 +18,6 @@ function Events.unregister(event)
     Events.registered[event] = nil
 end
 
-local function registerPreHooks()
-    if TSC_TooltipsModule and ItemTooltip and ItemTooltip.SetBagItem then
-        TSCPriceFetcher.modules.debug.log("PreHooking ItemTooltip:SetBagItem")
-        ZO_PreHook(ItemTooltip, "SetBagItem", function(tooltipControl, bagId, slotIndex)
-            TSC_TooltipsModule.OnTooltipShown(nil, tooltipControl, nil, bagId, slotIndex)
-            return false
-        end)
-        TSCPriceFetcher.modules.debug.success("Successfully PreHooked ItemTooltip:SetBagItem")
-    else
-        TSCPriceFetcher.modules.debug.warn(
-            "Events: Could not register PreHooks")
-    end
-end
-
 -- Register all events needed for your addon
 function Events.registerAll()
     TSCPriceFetcher.modules.debug.log("Registering all events")
@@ -44,7 +30,6 @@ function Events.registerAll()
     end)
 
     Events.register(EVENT_PLAYER_ACTIVATED, function()
-        registerPreHooks()
         Events.unregister(EVENT_PLAYER_ACTIVATED)
     end)
 

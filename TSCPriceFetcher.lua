@@ -11,6 +11,7 @@ _G.TSCPriceFetcher = TSCPriceFetcher
 
 -- Load order matters, so we load core first
 TSCPriceFetcher.modules.debug = TSC_DebugModule
+TSCPriceFetcher.modules.tooltips = TSC_TooltipsModule
 TSCPriceFetcher.modules.init = TSC_InitModule
 TSCPriceFetcher.modules.events = TSC_EventsModule
 TSCPriceFetcher.modules.events.registerAll()
