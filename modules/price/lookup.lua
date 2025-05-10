@@ -8,6 +8,14 @@ local priceData = TSCPriceNameData
 
 local Lookup = {}
 
+local function StripEsoSuffix(itemName)
+    return itemName:match("^(.-)%^") or itemName
+end
+
+local function IsValidItemName(itemName)
+    return type(itemName) == "string" and itemName ~= ""
+end
+
 --[[
     Gets the price for a given item name, formatted with commas for thousands.
     If the item is not found, returns a default string ("No price data").
@@ -20,7 +28,8 @@ local Lookup = {}
 ]]
 function Lookup.getFormattedPrice(itemName)
     TSCPriceFetcher.modules.debug.log("Lookup: Looking up price for itemName='" .. tostring(itemName) .. "'")
-    local price = Lookup.getPrice(itemName)
+    local cleanName = StripEsoSuffix(itemName)
+    local price = Lookup.getPrice(cleanName)
     if price then
         TSCPriceFetcher.modules.debug.log("Lookup: Found price='" .. tostring(price) .. "'")
         if TSC_FormatterModule then
@@ -34,15 +43,12 @@ function Lookup.getFormattedPrice(itemName)
     return "no price data"
 end
 
-local function IsValidItemName(itemName)
-    return type(itemName) == "string" and itemName ~= ""
-end
-
 function Lookup.getPrice(itemName)
     if not IsValidItemName(itemName) then
         return nil
     end
-    return priceData[string.lower(itemName)]
+    local cleanName = StripEsoSuffix(itemName)
+    return priceData[string.lower(cleanName)]
 end
 
 TSC_LookupModule = Lookup
