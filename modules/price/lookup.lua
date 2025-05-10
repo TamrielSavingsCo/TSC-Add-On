@@ -1,5 +1,10 @@
-local data = TSCPriceNameData
-local info = TSCPriceNameDataInfo
+--[[
+       modules/price/lookup.lua
+       Provides price lookup and formatting for item names.
+       Exposes: getFormattedPrice, getPrice
+]]
+
+local priceData = TSCPriceNameData
 
 local Lookup = {}
 
@@ -11,11 +16,11 @@ local Lookup = {}
 
     Usage:
         local formatted = Lookup.getFormattedPrice("Acai Berry")
-        -- formatted will be "1,234" or "No price data"
+        -- formatted will be "1,234" or "no price data"
 ]]
 function Lookup.getFormattedPrice(itemName)
     TSCPriceFetcher.modules.debug.log("Lookup: Looking up price for itemName='" .. tostring(itemName) .. "'")
-    local price = data[itemName]
+    local price = Lookup.getPrice(itemName)
     if price then
         TSCPriceFetcher.modules.debug.log("Lookup: Found price='" .. tostring(price) .. "'")
         if TSC_FormatterModule then
@@ -24,25 +29,20 @@ function Lookup.getFormattedPrice(itemName)
             return tostring(price) .. " gold"
         end
     end
+
     TSCPriceFetcher.modules.debug.warn("Lookup: No price data for itemName='" .. tostring(itemName) .. "'")
     return "no price data"
 end
 
---[[
-    Gets the raw price number for a given item name.
-    @param itemName (string) - The name of the item to look up.
-    @return (number|nil) - The price as a number, or nil if not found.
+local function IsValidItemName(itemName)
+    return type(itemName) == "string" and itemName ~= ""
+end
 
-    Usage:
-        local price = Lookup.getPrice("Acai Berry")
-        if price then
-            -- Use the price number
-        else
-            -- Handle missing price
-        end
-]]
 function Lookup.getPrice(itemName)
-    return data[itemName]
+    if not IsValidItemName(itemName) then
+        return nil
+    end
+    return priceData[string.lower(itemName)]
 end
 
 TSC_LookupModule = Lookup
