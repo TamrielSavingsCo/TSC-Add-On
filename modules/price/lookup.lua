@@ -19,13 +19,13 @@ function Lookup.getFormattedPrice(itemName)
     if price then
         TSCPriceFetcher.modules.debug.log("Lookup: Found price='" .. tostring(price) .. "'")
         if TSC_FormatterModule then
-            return TSC_FormatterModule.toGold(price)
+            return TSC_FormatterModule.toGold(price) .. " gold"
         else
-            return tostring(price)
+            return tostring(price) .. " gold"
         end
     end
     TSCPriceFetcher.modules.debug.warn("Lookup: No price data for itemName='" .. tostring(itemName) .. "'")
-    return "No price data"
+    return "no price data"
 end
 
 --[[
