@@ -9,16 +9,12 @@ local TSCPriceFetcher = {
 -- Make it globally accessible (needed for ESO addon structure)
 _G.TSCPriceFetcher = TSCPriceFetcher
 
--- Load order matters, so we load core first
 TSCPriceFetcher.modules.debug = TSC_DebugModule
 TSCPriceFetcher.modules.tooltips = TSC_TooltipsModule
 TSCPriceFetcher.modules.init = TSC_InitModule
 TSCPriceFetcher.modules.events = TSC_EventsModule
-TSCPriceFetcher.modules.events.registerAll()
-
--- Then business logic
 TSCPriceFetcher.modules.lookup = TSC_LookupModule
 
-
+TSCPriceFetcher.modules.events.registerAll()
 
 return TSCPriceFetcher
