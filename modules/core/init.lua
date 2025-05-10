@@ -23,6 +23,40 @@ function Init.initialize()
     end
     Init.isInitialized = true
     TSCPriceFetcher.modules.debug.log("Init: Addon initialized")
+
+    local function AddPriceToGamepadTooltip(tooltipObject, tooltipType, itemLink)
+        if tooltipType ~= GAMEPAD_LEFT_TOOLTIP then return end
+
+        if not tooltipObject or not itemLink or itemLink == "" then return end
+
+        local tooltip = tooltipObject:GetTooltip(tooltipType)
+        if not tooltip then return end
+
+        local itemName = GetItemLinkName(itemLink)
+        if not itemName or itemName == "" then return end
+
+        local priceString = TSCPriceFetcher.modules.lookup.getFormattedPrice(itemName)
+        if not priceString then return end
+
+        local priceSection = tooltip:AcquireSection(tooltip:GetStyle("bodySection"))
+        priceSection:AddLine("Tamriel Savings Co: " .. priceString .. " gold", tooltip:GetStyle("bodyDescription"))
+        tooltip:AddSection(priceSection)
+    end
+
+    local function HookGamepadTooltips()
+        SecurePostHook(GAMEPAD_TOOLTIPS, "LayoutItem", function(tooltipObject, tooltipType, itemLink, ...)
+            d("AddPriceToGamepadTooltip: tooltipType=" .. tostring(tooltipType) .. ", itemLink=" .. tostring(itemLink))
+            AddPriceToGamepadTooltip(tooltipObject, tooltipType, itemLink)
+        end)
+        SecurePostHook(GAMEPAD_TOOLTIPS, "LayoutBagItem", function(tooltipObject, tooltipType, bagId, slotIndex, ...)
+            local itemLink = GetItemLink(bagId, slotIndex)
+            AddPriceToGamepadTooltip(tooltipObject, tooltipType, itemLink)
+        end)
+        -- Add more hooks as needed
+    end
+
+    -- Call this once during your addon initialization
+    HookGamepadTooltips()
 end
 
 --[[

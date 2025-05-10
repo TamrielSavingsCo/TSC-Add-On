@@ -19,7 +19,6 @@ function Events.unregister(event)
 end
 
 local function registerPreHooks()
-    -- Hook ItemTooltip:SetBagItem if available
     if TSC_TooltipsModule and ItemTooltip and ItemTooltip.SetBagItem then
         TSCPriceFetcher.modules.debug.log("PreHooking ItemTooltip:SetBagItem")
         ZO_PreHook(ItemTooltip, "SetBagItem", function(tooltipControl, bagId, slotIndex)
@@ -30,15 +29,6 @@ local function registerPreHooks()
     else
         TSCPriceFetcher.modules.debug.warn(
             "Events: Could not register PreHooks")
-    end
-
-    if GAMEPAD_TOOLTIPS and GAMEPAD_TOOLTIPS.layoutFunctions then
-        TSCPriceFetcher.modules.debug.log("PreHooking GAMEPAD_TOOLTIPS:LayoutBagItem")
-        ZO_PreHook(GAMEPAD_TOOLTIPS, "LayoutBagItem", function(self, tooltipType, bagId, slotIndex, ...)
-            TSC_TooltipsModule.OnTooltipShown(nil, self, nil, bagId, slotIndex)
-            return false
-        end)
-        TSCPriceFetcher.modules.debug.success("Successfully PreHooked GAMEPAD_TOOLTIPS:LayoutBagItem")
     end
 end
 

@@ -14,17 +14,17 @@ local Lookup = {}
         -- formatted will be "1,234" or "No price data"
 ]]
 function Lookup.getFormattedPrice(itemName)
-    TSCPriceFetcher.modules.debug.log("Lookup: Looking up price for itemName=" .. tostring(itemName))
+    TSCPriceFetcher.modules.debug.log("Lookup: Looking up price for itemName='" .. tostring(itemName) .. "'")
     local price = data[itemName]
     if price then
-        TSCPriceFetcher.modules.debug.log("Lookup: Found price=" .. tostring(price))
+        TSCPriceFetcher.modules.debug.log("Lookup: Found price='" .. tostring(price) .. "'")
         if TSC_FormatterModule then
             return TSC_FormatterModule.toGold(price)
         else
             return tostring(price)
         end
     end
-    TSCPriceFetcher.modules.debug.warn("Lookup: No price data for itemName=" .. tostring(itemName))
+    TSCPriceFetcher.modules.debug.warn("Lookup: No price data for itemName='" .. tostring(itemName) .. "'")
     return "No price data"
 end
 

@@ -56,6 +56,9 @@ TSCPriceNameData = {
     ["Metheglin"] = 123,
     ["Millet"] = 123,
     ["Mint"] = 123,
+    ["Butterly Wing"] = 123,
+    ["Mountain Flower"] = 123,
+    ["Rawhide Scraps"] = 123,
 }
 
 return {
