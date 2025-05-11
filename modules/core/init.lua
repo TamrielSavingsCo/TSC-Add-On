@@ -9,30 +9,43 @@ local Init = {}
 -- Flag to track if the addon is initialized
 Init.isInitialized = false
 
+-- Helper: Extract itemLink from selectedData
+local function ExtractItemLink(selectedData)
+    if selectedData.bagId and selectedData.slotIndex then
+        return GetItemLink(selectedData.bagId, selectedData.slotIndex)
+    elseif selectedData.itemLink then
+        return selectedData.itemLink
+    end
+    return nil
+end
+
+-- Helper: Validate selectedData for price display
+local function IsValidItem(selectedData, itemLink)
+    if not selectedData then return false end
+    if selectedData.isCurrencyEntry or selectedData.isMundusEntry then return false end
+    if not itemLink then return false end
+    local itemName = GetItemLinkName(itemLink)
+    if not itemName or itemName == "" then return false end
+    return true
+end
+
+-- Handler for inventory tooltip
+local function OnGamepadInventoryTooltip(self, selectedData)
+    local itemLink = ExtractItemLink(selectedData)
+    if not IsValidItem(selectedData, itemLink) then return end
+
+    local tooltipObject = GAMEPAD_TOOLTIPS
+    local tooltipType = GAMEPAD_LEFT_TOOLTIP
+
+    TSCPriceFetcher.modules.tooltips.AddPriceToGamepadTooltip(tooltipObject, tooltipType, itemLink)
+
+    TSCPriceFetcher.modules.debug.log("selectedData: " ..
+        zo_strjoin(", ", tostring(selectedData.bagId), tostring(selectedData.slotIndex),
+            tostring(selectedData.itemLink)))
+end
+
 local function HookGamepadTooltips()
-    -- Hook inventory item tooltips - this is the most reliable hook
-    SecurePostHook(ZO_GamepadInventory, "UpdateItemLeftTooltip", function(self, selectedData)
-        -- Only add price data when there's a selected item
-        if not selectedData then return end
-
-        -- Check if we're really dealing with an item
-        if not selectedData.bagId or not selectedData.slotIndex then return end
-
-        -- Make sure we don't add prices for non-inventory contexts
-        if selectedData.isCurrencyEntry or selectedData.isMundusEntry then return end
-
-        -- Check if this is an actual item (has a valid name)
-        local itemLink = GetItemLink(selectedData.bagId, selectedData.slotIndex)
-        local itemName = GetItemLinkName(itemLink)
-        if not itemName or itemName == "" then return end
-
-        -- Get the left tooltip object that was just updated by the base function
-        local tooltipObject = GAMEPAD_TOOLTIPS
-        local tooltipType = GAMEPAD_LEFT_TOOLTIP
-
-        -- Use our throttled tooltip function to add the price
-        TSCPriceFetcher.modules.tooltips.AddPriceToGamepadTooltip(tooltipObject, tooltipType, itemLink)
-    end)
+    SecurePostHook(ZO_GamepadInventory, "UpdateItemLeftTooltip", OnGamepadInventoryTooltip)
 end
 
 --- Initializes the addon (called on EVENT_ADD_ON_LOADED)
