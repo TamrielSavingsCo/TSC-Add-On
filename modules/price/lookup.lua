@@ -5,6 +5,7 @@
 ]]
 
 local priceData = TSCPriceNameData
+local goldIcon = "|t32:32:EsoUI/Art/currency/currency_gold.dds|t"
 
 local Lookup = {}
 
@@ -33,7 +34,7 @@ function Lookup.getFormattedPrice(itemName)
     if price then
         TSCPriceFetcher.modules.debug.log("Lookup: Found price='" .. tostring(price) .. "'")
         if TSC_FormatterModule then
-            return TSC_FormatterModule.toGold(price) .. " gold"
+            return TSC_FormatterModule.toGold(price) .. " " .. goldIcon
         else
             return tostring(price) .. " gold"
         end
