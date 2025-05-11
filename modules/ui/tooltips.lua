@@ -12,24 +12,56 @@ local Tooltips = {}
     @return (boolean): true if price info is present, false otherwise.
 ]]
 local function TooltipHasPriceLine(tooltip)
-    if not tooltip or not tooltip.scrollTooltip then return false end
+    TSCPriceFetcher.modules.debug.log("TooltipHasPriceLine called")
+    if not tooltip then
+        TSCPriceFetcher.modules.debug.log("TooltipHasPriceLine: tooltip is nil")
+        return false
+    end
 
-    -- Get the content container from the scroll tooltip
-    local content = tooltip.scrollTooltip.contents
-    if not content or not content.GetNumChildren then return false end
-
-    -- Check all child controls
-    local numChildren = content:GetNumChildren()
-    for i = 1, numChildren do
-        local child = content:GetChild(i)
-        if child and child.GetText then
-            local text = child:GetText()
-            if text and text:find("Tamriel Savings Co:") then
-                return true
+    -- Check scrollTooltip.contents (classic way)
+    if tooltip.scrollTooltip and tooltip.scrollTooltip.contents and tooltip.scrollTooltip.contents.GetNumChildren then
+        TSCPriceFetcher.modules.debug.log("TooltipHasPriceLine: using scrollTooltip.contents")
+        local content = tooltip.scrollTooltip.contents
+        local numChildren = content:GetNumChildren()
+        for i = 1, numChildren do
+            local child = content:GetChild(i)
+            if child then
+                local text = child.GetText and child:GetText() or "<no GetText>"
+                TSCPriceFetcher.modules.debug.log("scrollTooltip child " ..
+                i .. ": " .. tostring(child) .. " | Text: " .. tostring(text))
+            end
+            if child and child.GetText then
+                local text = child:GetText()
+                if text and text:find("Tamriel Savings Co:") then
+                    TSCPriceFetcher.modules.debug.log("TooltipHasPriceLine: found price line in scrollTooltip.contents")
+                    return true
+                end
             end
         end
     end
 
+    -- Check direct children (for tooltips without scrollTooltip)
+    if tooltip.GetNumChildren then
+        TSCPriceFetcher.modules.debug.log("TooltipHasPriceLine: using direct children")
+        local numChildren = tooltip:GetNumChildren()
+        for i = 1, numChildren do
+            local child = tooltip:GetChild(i)
+            if child then
+                local text = child.GetText and child:GetText() or "<no GetText>"
+                TSCPriceFetcher.modules.debug.log("direct child " ..
+                i .. ": " .. tostring(child) .. " | Text: " .. tostring(text))
+            end
+            if child and child.GetText then
+                local text = child:GetText()
+                if text and text:find("Tamriel Savings Co:") then
+                    TSCPriceFetcher.modules.debug.log("TooltipHasPriceLine: found price line in direct children")
+                    return true
+                end
+            end
+        end
+    end
+
+    TSCPriceFetcher.modules.debug.log("TooltipHasPriceLine: price line not found")
     return false
 end
 
