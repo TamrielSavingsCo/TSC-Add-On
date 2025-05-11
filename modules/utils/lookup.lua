@@ -1,6 +1,6 @@
 --[[
-       modules/price/lookup.lua
-       Provides price lookup and formatting for item names.
+       modules/utils/lookup.lua
+       Provides price lookup for item names.
        Exposes: getFormattedPrice, getPrice
 ]]
 
@@ -9,10 +9,7 @@ local goldIcon = "|t32:32:EsoUI/Art/currency/currency_gold.dds|t"
 
 local Lookup = {}
 
-local function StripEsoSuffix(itemName)
-    if type(itemName) ~= "string" then return "" end
-    return itemName:match("^(.-)%^") or itemName
-end
+
 
 local function IsValidItemName(itemName)
     return type(itemName) == "string" and itemName ~= ""
@@ -34,7 +31,7 @@ function Lookup.getFormattedPrice(itemName)
         return "no price data"
     end
     TSCPriceFetcher.modules.debug.log("Lookup: Looking up price for itemName='" .. tostring(itemName) .. "'")
-    local cleanName = StripEsoSuffix(itemName)
+    local cleanName = TSC_FormatterModule.StripEsoSuffix(itemName)
     local price = Lookup.getPrice(cleanName)
     if price then
         TSCPriceFetcher.modules.debug.log("Lookup: Found price='" .. tostring(price) .. "'")
@@ -53,7 +50,7 @@ function Lookup.getPrice(itemName)
     if not IsValidItemName(itemName) then
         return nil
     end
-    local cleanName = StripEsoSuffix(itemName)
+    local cleanName = TSC_FormatterModule.StripEsoSuffix(itemName)
     return priceData[string.lower(cleanName)]
 end
 

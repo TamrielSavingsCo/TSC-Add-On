@@ -18,8 +18,8 @@ TSCPriceNameData.lua
 # Then load the module files
 modules/core/debug.lua
 modules/ui/tooltips.lua
-modules/price/lookup.lua
-modules/price/format.lua
+modules/utils/lookup.lua
+modules/utils/format.lua
 modules/core/init.lua
 modules/core/events.lua
 
