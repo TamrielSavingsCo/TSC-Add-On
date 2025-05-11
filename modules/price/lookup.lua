@@ -10,6 +10,7 @@ local goldIcon = "|t32:32:EsoUI/Art/currency/currency_gold.dds|t"
 local Lookup = {}
 
 local function StripEsoSuffix(itemName)
+    if type(itemName) ~= "string" then return "" end
     return itemName:match("^(.-)%^") or itemName
 end
 
@@ -28,6 +29,10 @@ end
         -- formatted will be "1,234" or "no price data"
 ]]
 function Lookup.getFormattedPrice(itemName)
+    if type(itemName) ~= "string" then
+        TSCPriceFetcher.modules.debug.warn("Lookup: itemName is not a string")
+        return "no price data"
+    end
     TSCPriceFetcher.modules.debug.log("Lookup: Looking up price for itemName='" .. tostring(itemName) .. "'")
     local cleanName = StripEsoSuffix(itemName)
     local price = Lookup.getPrice(cleanName)

@@ -11,6 +11,7 @@ Init.isInitialized = false
 
 -- Helper: Extract itemLink from selectedData
 local function ExtractItemLink(selectedData)
+    if not selectedData then return nil end
     if selectedData.bagId and selectedData.slotIndex then
         return GetItemLink(selectedData.bagId, selectedData.slotIndex)
     elseif selectedData.itemLink then

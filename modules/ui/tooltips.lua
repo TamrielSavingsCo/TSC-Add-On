@@ -28,7 +28,7 @@ local function TooltipHasPriceLine(tooltip)
             if child then
                 local text = child.GetText and child:GetText() or "<no GetText>"
                 TSCPriceFetcher.modules.debug.log("scrollTooltip child " ..
-                i .. ": " .. tostring(child) .. " | Text: " .. tostring(text))
+                    i .. ": " .. tostring(child) .. " | Text: " .. tostring(text))
             end
             if child and child.GetText then
                 local text = child:GetText()
@@ -49,7 +49,7 @@ local function TooltipHasPriceLine(tooltip)
             if child then
                 local text = child.GetText and child:GetText() or "<no GetText>"
                 TSCPriceFetcher.modules.debug.log("direct child " ..
-                i .. ": " .. tostring(child) .. " | Text: " .. tostring(text))
+                    i .. ": " .. tostring(child) .. " | Text: " .. tostring(text))
             end
             if child and child.GetText then
                 local text = child:GetText()
