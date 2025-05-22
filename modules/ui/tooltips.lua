@@ -32,7 +32,7 @@ local function TooltipHasPriceLine(tooltip)
             end
             if child and child.GetText then
                 local text = child:GetText()
-                if text and text:find("Tamriel Savings Co:") then
+                if text and text:find("Average Price: ") then
                     TSCPriceFetcher.modules.debug.log("TooltipHasPriceLine: found price line in scrollTooltip.contents")
                     return true
                 end
@@ -53,7 +53,7 @@ local function TooltipHasPriceLine(tooltip)
             end
             if child and child.GetText then
                 local text = child:GetText()
-                if text and text:find("Tamriel Savings Co:") then
+                if text and text:find("Average Price: ") then
                     TSCPriceFetcher.modules.debug.log("TooltipHasPriceLine: found price line in direct children")
                     return true
                 end
@@ -72,7 +72,8 @@ end
 ]]
 local function AddPriceSection(tooltip, priceString)
     local priceSection = tooltip:AcquireSection(tooltip:GetStyle("bodySection"))
-    priceSection:AddLine("Tamriel Savings Co: " .. priceString, tooltip:GetStyle("bodyDescription"))
+    priceSection:AddLine("Tamriel Savings Co", tooltip:GetStyle("bodyDescription"))
+    priceSection:AddLine("Average Price: " .. priceString, tooltip:GetStyle("bodyDescription"))
     tooltip:AddSection(priceSection)
 end
 
