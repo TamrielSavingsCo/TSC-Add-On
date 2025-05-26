@@ -15,6 +15,7 @@ work with dependencies:
 - [ ] Get tooltip working in trade windows
 - [ ] Get tooltip working in crafting result tooltips
 - [ ] Get tooltip working in guild store listings
+    - [ ] Set average price as default value in guild store when listing
 - [ ] Get tooltip working in loot windows
 - [ ] Get tooltip working in craft bag
     - [ ] Investigate if there is a tooltip in the craft bag and if it can be hooked
