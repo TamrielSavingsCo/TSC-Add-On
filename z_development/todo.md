@@ -1,3 +1,12 @@
+work with dependencies:
+- [x] Update the lookup module to check TSCPriceFetcher.dataSource and call appropriate data addon API
+- [x] Create adapter functions to normalize differences between full/lite data addon APIs
+- [x] Handle data format differences (array vs single number) in lookup module
+- [x] Add feature detection for conditional UI elements based on available data source
+- [x] Remove hardcoded TSCPriceNameData.lua dependency once external data sources work
+- [x] Add fallback handling for when data addon exists but returns null/empty for specific items
+- [ ] Test all scenarios: full data, lite data, and no data
+
 # TODO
 
 - [ ] Get tooltip working for weapons and armor

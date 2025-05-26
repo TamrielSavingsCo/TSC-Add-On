@@ -5,6 +5,7 @@
 ## Version: 0.0.1
 ## AddOnVersion: 0.0.1
 ## SavedVariables: TSCPriceFetcherData
+## OptionalDependsOn: TSCPriceDataFull TSCPriceDataLite
 ##
 ## This Add-on is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates. 
 ## The Elder Scrolls® and related logos are registered trademarks or trademarks of ZeniMax Media Inc. in the United States and/or other countries. 
@@ -12,14 +13,12 @@
 ##
 ## You can read the full terms at https://account.elderscrollsonline.com/add-on-terms
 
-# Load price data first
-TSCPriceNameData.lua
-
 # Then load the module files
 modules/core/debug.lua
 modules/ui/tooltips.lua
 modules/utils/lookup.lua
 modules/utils/format.lua
+modules/utils/data_adapter.lua
 modules/core/init.lua
 modules/core/events.lua
 

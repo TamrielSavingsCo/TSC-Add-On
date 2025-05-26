@@ -68,12 +68,32 @@ end
 --[[
     Adds a formatted price section to the tooltip.
     @param tooltip (table): The tooltip object to modify.
-    @param priceString (string): The price string to display.
+    @param itemName (string): The item name for price lookup.
+    @param itemLink (string): The item link string.
 ]]
-local function AddPriceSection(tooltip, priceString)
+local function AddPriceSection(tooltip, itemName, itemLink)
+    local cleanName = TSC_FormatterModule.StripEsoSuffix(itemName)
+    TSCPriceFetcher.modules.debug.log("AddPriceSection called for: " ..
+        tostring(itemName) .. " (cleaned: " .. tostring(cleanName) .. ")")
+
     local priceSection = tooltip:AcquireSection(tooltip:GetStyle("bodySection"))
     priceSection:AddLine("Tamriel Savings Co", tooltip:GetStyle("bodyDescription"))
-    priceSection:AddLine("Average Price: " .. priceString, tooltip:GetStyle("bodyDescription"))
+
+    -- Always show average price (handles "no price data" internally)
+    local formattedPrice = TSCPriceFetcher.modules.dataAdapter.getFormattedAvgPrice(itemName, itemLink)
+    priceSection:AddLine("Average Price: " .. formattedPrice, tooltip:GetStyle("bodyDescription"))
+
+    -- Show additional info if available
+    local priceRange = TSCPriceFetcher.modules.dataAdapter.getFormattedPriceRange(itemName, itemLink)
+    if priceRange then
+        priceSection:AddLine("Range: " .. priceRange, tooltip:GetStyle("bodyDescription"))
+    end
+
+    local salesCount = TSCPriceFetcher.modules.dataAdapter.getSalesCount(itemName, itemLink)
+    if salesCount then
+        priceSection:AddLine("Sales: " .. tostring(salesCount), tooltip:GetStyle("bodyDescription"))
+    end
+
     tooltip:AddSection(priceSection)
 end
 
@@ -116,11 +136,11 @@ function Tooltips.AddPriceToGamepadTooltip(tooltipObject, tooltipType, itemLink)
 
     if TooltipHasPriceLine(tooltip) then return end
 
-    local priceString = TSCPriceFetcher.modules.lookup.getFormattedPrice(GetItemLinkName(itemLink))
-    if not priceString then return end
+    local itemName = GetItemLinkName(itemLink)
+    if not itemName then return end
 
     local success, result = pcall(function()
-        AddPriceSection(tooltip, priceString)
+        AddPriceSection(tooltip, itemName, itemLink)
         return true
     end)
 

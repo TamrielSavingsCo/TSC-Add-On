@@ -37,9 +37,9 @@ function Events.registerAll()
     end)
 
     Events.register(EVENT_PLAYER_ACTIVATED, function()
+        TSCPriceFetcher.initializeDataSource()
         Events.unregister(EVENT_PLAYER_ACTIVATED)
     end)
-
 
     TSCPriceFetcher.modules.debug.success("Successfully registered all events")
 end

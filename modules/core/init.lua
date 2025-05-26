@@ -55,6 +55,10 @@ function Init.initialize()
         TSCPriceFetcher.modules.debug.log("Init: Already initialized")
         return
     end
+
+    -- Initialize data source detection
+    TSCPriceFetcher.initializeDataSource()
+
     Init.isInitialized = true
     TSCPriceFetcher.modules.debug.success("Init: Addon initialized")
     HookGamepadTooltips()
