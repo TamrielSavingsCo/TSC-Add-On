@@ -5,7 +5,7 @@ work with dependencies:
 - [x] Add feature detection for conditional UI elements based on available data source
 - [x] Remove hardcoded TSCPriceNameData.lua dependency once external data sources work
 - [x] Add fallback handling for when data addon exists but returns null/empty for specific items
-- [ ] Test all scenarios: full data, lite data, and no data
+- [x] Test all scenarios: full data, lite data, and no data
 
 # TODO
 
@@ -21,16 +21,14 @@ work with dependencies:
 
 
 - [ ] Add user feedback for "no price data" (e.g., subtle line, optional hiding in settings)
-- [ ] Add comparison features (price per unit for stackables, total stack value)
-- [ ] Add advanced filtering options
-    - [ ] Only show price for items above/below a certain value
-    - [ ] Hide price for bound or non-tradable items
+- [x] Add advanced filtering options
+    - [x] Hide price for bound or non-tradable items
 
 # Refactor
 
-- [ ] refactor the data file to use ids for items with single ids
-- [ ] refactor the data file to use names for items with multiple ids
-- [ ] refactor the lookup to try by id first, then fall back to name
+- [x] refactor the data file to use ids for items with single ids
+- [x] refactor the data file to use names for items with multiple ids
+- [x] refactor the lookup to try by id first, then fall back to name
 
 ## Nice to have
 

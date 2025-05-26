@@ -5,6 +5,11 @@
 ]]
 local Tooltips = {}
 
+-- Constants
+local COLORS = {
+    TSC_GREEN = "009449"
+}
+
 --[[
     Checks if the tooltip already contains a price line from this addon.
     Prevents duplicate price info from being added.
@@ -65,6 +70,10 @@ local function TooltipHasPriceLine(tooltip)
     return false
 end
 
+local function colorize(msg, color)
+    return string.format("|c%s%s|r", color, tostring(msg))
+end
+
 --[[
     Adds a formatted price section to the tooltip.
     @param tooltip (table): The tooltip object to modify.
@@ -77,7 +86,7 @@ local function AddPriceSection(tooltip, itemName, itemLink)
         tostring(itemName) .. " (cleaned: " .. tostring(cleanName) .. ")")
 
     local priceSection = tooltip:AcquireSection(tooltip:GetStyle("bodySection"))
-    priceSection:AddLine("Tamriel Savings Co", tooltip:GetStyle("bodyDescription"))
+    priceSection:AddLine(colorize("Tamriel Savings Co", COLORS.TSC_GREEN), tooltip:GetStyle("bodyDescription"))
 
     -- Always show average price (handles "no price data" internally)
     local formattedPrice = TSCPriceFetcher.modules.dataAdapter.getFormattedAvgPrice(itemName, itemLink)
