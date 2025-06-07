@@ -30,11 +30,6 @@ local function TooltipHasPriceLine(tooltip)
         local numChildren = content:GetNumChildren()
         for i = 1, numChildren do
             local child = content:GetChild(i)
-            if child then
-                local text = child.GetText and child:GetText() or "<no GetText>"
-                TSCPriceFetcher.modules.debug.log("scrollTooltip child " ..
-                    i .. ": " .. tostring(child) .. " | Text: " .. tostring(text))
-            end
             if child and child.GetText then
                 local text = child:GetText()
                 if text and text:find("Average Price: ") then
@@ -51,11 +46,6 @@ local function TooltipHasPriceLine(tooltip)
         local numChildren = tooltip:GetNumChildren()
         for i = 1, numChildren do
             local child = tooltip:GetChild(i)
-            if child then
-                local text = child.GetText and child:GetText() or "<no GetText>"
-                TSCPriceFetcher.modules.debug.log("direct child " ..
-                    i .. ": " .. tostring(child) .. " | Text: " .. tostring(text))
-            end
             if child and child.GetText then
                 local text = child:GetText()
                 if text and text:find("Average Price: ") then
@@ -77,28 +67,23 @@ end
 --[[
     Adds a formatted price section to the tooltip.
     @param tooltip (table): The tooltip object to modify.
-    @param itemName (string): The item name for price lookup.
     @param itemLink (string): The item link string.
 ]]
-local function AddPriceSection(tooltip, itemName, itemLink)
-    local cleanName = TSC_FormatterModule.StripEsoSuffix(itemName)
-    TSCPriceFetcher.modules.debug.log("AddPriceSection called for: " ..
-        tostring(itemName) .. " (cleaned: " .. tostring(cleanName) .. ")")
-
+local function AddPriceSection(tooltip, itemLink)
     local priceSection = tooltip:AcquireSection(tooltip:GetStyle("bodySection"))
     priceSection:AddLine(colorize("Tamriel Savings Co", COLORS.TSC_GREEN), tooltip:GetStyle("bodyDescription"))
 
     -- Always show average price (handles "no price data" internally)
-    local formattedPrice = TSCPriceFetcher.modules.dataAdapter.getFormattedAvgPrice(itemName, itemLink)
+    local formattedPrice = TSCPriceFetcher.modules.dataAdapter.getFormattedAvgPrice(itemLink)
     priceSection:AddLine("Average Price: " .. formattedPrice, tooltip:GetStyle("bodyDescription"))
 
     -- Show additional info if available
-    local priceRange = TSCPriceFetcher.modules.dataAdapter.getFormattedPriceRange(itemName, itemLink)
+    local priceRange = TSCPriceFetcher.modules.dataAdapter.getFormattedPriceRange(itemLink)
     if priceRange then
         priceSection:AddLine("Range: " .. priceRange, tooltip:GetStyle("bodyDescription"))
     end
 
-    local salesCount = TSCPriceFetcher.modules.dataAdapter.getSalesCount(itemName, itemLink)
+    local salesCount = TSCPriceFetcher.modules.dataAdapter.getSalesCount(itemLink)
     if salesCount then
         priceSection:AddLine("Sales: " .. tostring(salesCount), tooltip:GetStyle("bodyDescription"))
     end
@@ -145,11 +130,8 @@ function Tooltips.AddPriceToGamepadTooltip(tooltipObject, tooltipType, itemLink)
 
     if TooltipHasPriceLine(tooltip) then return end
 
-    local itemName = GetItemLinkName(itemLink)
-    if not itemName then return end
-
     local success, result = pcall(function()
-        AddPriceSection(tooltip, itemName, itemLink)
+        AddPriceSection(tooltip, itemLink)
         return true
     end)
 

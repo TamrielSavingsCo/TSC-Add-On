@@ -1,6 +1,6 @@
 --[[
        modules/utils/lookup.lua
-       Provides price lookup for item names.
+       Provides price lookup for items.
        Exposes: getFormattedPrice, getPrice
 ]]
 
@@ -8,52 +8,25 @@ local goldIcon = "|t32:32:EsoUI/Art/currency/currency_gold.dds|t"
 
 local Lookup = {}
 
-local function IsValidItemName(itemName)
-    return type(itemName) == "string" and itemName ~= ""
+local function IsValidItemLink(itemLink)
+    return type(itemLink) == "string" and itemLink:match("^|H%d:item:")
 end
 
--- Get price from the appropriate data source
-local function getPriceFromDataSource(itemName)
-    return TSCPriceFetcher.modules.dataAdapter.getAvgPrice(itemName)
-end
-
---[[
-    Gets the price for a given item name, formatted with commas for thousands.
-    If the item is not found, returns a default string ("No price data").
-    @param itemName (string) - The name of the item to look up.
-    @return (string) - The formatted price as a string (e.g., "1,234"), or the default string if not found.
-
-    Usage:
-        local formatted = Lookup.getFormattedPrice("Acai Berry")
-        -- formatted will be "1,234" or "no price data"
-]]
-function Lookup.getFormattedPrice(itemName)
-    if type(itemName) ~= "string" then
-        TSCPriceFetcher.modules.debug.warn("Lookup: itemName is not a string")
+function Lookup.getFormattedPrice(itemLink)
+    if not IsValidItemLink(itemLink) then
+        TSCPriceFetcher.modules.debug.warn("Lookup: invalid itemLink")
         return "no price data"
     end
 
-    TSCPriceFetcher.modules.debug.log("Lookup: Looking up price for itemName='" .. tostring(itemName) .. "'")
-
-    local price = getPriceFromDataSource(itemName)
-    if price then
-        TSCPriceFetcher.modules.debug.log("Lookup: Found price='" .. tostring(price) .. "'")
-        if TSC_FormatterModule then
-            return TSC_FormatterModule.toGold(price) .. " " .. goldIcon
-        else
-            return tostring(price) .. " gold"
-        end
-    end
-
-    TSCPriceFetcher.modules.debug.warn("Lookup: No price data for itemName='" .. tostring(itemName) .. "'")
-    return "no price data"
+    TSCPriceFetcher.modules.debug.log("Lookup: Looking up price for itemLink='" .. tostring(itemLink) .. "'")
+    return TSCPriceFetcher.modules.dataAdapter.getFormattedAvgPrice(itemLink)
 end
 
-function Lookup.getPrice(itemName)
-    if not IsValidItemName(itemName) then
+function Lookup.getPrice(itemLink)
+    if not IsValidItemLink(itemLink) then
         return nil
     end
-    return getPriceFromDataSource(itemName)
+    return TSCPriceFetcher.modules.dataAdapter.getAvgPrice(itemLink)
 end
 
 TSC_LookupModule = Lookup
