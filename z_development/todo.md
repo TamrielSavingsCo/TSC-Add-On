@@ -9,6 +9,7 @@ work with dependencies:
 
 # TODO
 
+- [ ] Get the average price into the guild listing automatically
 - [ ] Get tooltip working for weapons and armor
 - [ ] Get tooltip working in shop interface
 - [ ] Get tooltip working in mail attachments
