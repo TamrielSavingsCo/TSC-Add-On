@@ -16,13 +16,11 @@ work with dependencies:
 - [ ] Get tooltip working in trade windows
 - [ ] Get tooltip working in crafting result tooltips
 - [ ] Get tooltip working in guild store listings
-    - [ ] Set average price as default value in guild store when listing
 - [ ] Get tooltip working in loot windows
 - [ ] Get tooltip working in craft bag
     - [ ] Investigate if there is a tooltip in the craft bag and if it can be hooked
 
 
-- [ ] Add user feedback for "no price data" (e.g., subtle line, optional hiding in settings)
 - [x] Add advanced filtering options
     - [x] Hide price for bound or non-tradable items
 
@@ -34,5 +32,9 @@ work with dependencies:
 
 ## Nice to have
 
-- [ ] Add settings menu (LibAddonMenu-2.0) for toggling features, icon size, debug, etc.
+- [ ] Add settings menu (LibAddonMenu-2.0)
+    - [ ] for toggling features 
+        - [ ] for toggling which data points are shown
+        - [ ] for toggling whether to automatically populate guild listing with average price
+    - [ ] icon size
 - [ ] Add price trends (min/max/average, last updated date)
