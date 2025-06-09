@@ -42,10 +42,6 @@ local function OnGamepadInventoryTooltip(self, selectedData)
     local tooltipType = GAMEPAD_LEFT_TOOLTIP
 
     TSCPriceFetcher.modules.tooltips.AddPriceToGamepadTooltip(tooltipObject, tooltipType, itemLink)
-
-    TSCPriceFetcher.modules.debug.log("selectedData: " ..
-        zo_strjoin(", ", tostring(selectedData.bagId), tostring(selectedData.slotIndex),
-            tostring(selectedData.itemLink)))
 end
 
 local function HookGamepadTooltips()
@@ -81,10 +77,10 @@ local function SetupTradingHouseHooks()
             if ourPrice ~= initialPostPrice then
                 -- Add safety checks and slight delay to ensure listing object is fully initialized
                 zo_callLater(function()
-                    if ZO_GamepadTradingHouse_CreateListing and ZO_GamepadTradingHouse_CreateListing.SetListingPrice then
+                    if TRADING_HOUSE_CREATE_LISTING_GAMEPAD and TRADING_HOUSE_CREATE_LISTING_GAMEPAD.SetListingPrice then
                         -- Safely call SetListingPrice with error handling
                         local success, errorMsg = pcall(function()
-                            ZO_GamepadTradingHouse_CreateListing:SetListingPrice(ourPrice)
+                            TRADING_HOUSE_CREATE_LISTING_GAMEPAD:SetListingPrice(ourPrice)
                         end)
 
                         if not success then
@@ -92,7 +88,7 @@ local function SetupTradingHouseHooks()
                             if not inPriceOverride then
                                 inPriceOverride = true
                                 ZO_TradingHouse_CreateListing_Gamepad_BeginCreateListing(selectedItem, bagId, slotIndex,
-                                ourPrice)
+                                    ourPrice)
                                 inPriceOverride = false
                             end
                         end
@@ -105,7 +101,6 @@ end
 --- Initializes the addon (called on EVENT_ADD_ON_LOADED)
 function Init.initialize()
     if Init.isInitialized then
-        TSCPriceFetcher.modules.debug.log("Init: Already initialized")
         return
     end
 
@@ -113,9 +108,11 @@ function Init.initialize()
     TSCPriceFetcher.initializeDataSource()
 
     Init.isInitialized = true
-    TSCPriceFetcher.modules.debug.success("Init: Addon initialized")
+
+    -- Set up existing hooks
     HookGamepadTooltips()
     SetupTradingHouseHooks()
+    TSCPriceFetcher.modules.createListingHooks.setupCreateListingHooks()
 end
 
 --- Returns true if the addon is initialized

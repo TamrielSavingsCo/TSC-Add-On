@@ -27,7 +27,6 @@ function DataAdapter.getAvgPrice(itemLink)
     -- Get item ID from link
     local itemId = GetItemLinkItemId(itemLink)
     if not itemId then
-        TSCPriceFetcher.modules.debug.warn("Failed to get item ID from link")
         return nil
     end
 
@@ -38,7 +37,6 @@ function DataAdapter.getAvgPrice(itemLink)
         price = TSCPriceDataLite:GetPrice(itemId)
     end
 
-    TSCPriceFetcher.modules.debug.log("Price lookup result for ID " .. tostring(itemId) .. ": " .. tostring(price))
     return price -- Returns nil if no data found
 end
 

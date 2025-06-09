@@ -5,7 +5,6 @@
 - [ ] Get tooltip working in mail attachments
 - [ ] Get tooltip working in trade windows
 - [ ] Get tooltip working in crafting result tooltips
-- [ ] Get tooltip working in guild store listings
 - [ ] Get tooltip working in loot windows
 - [ ] Get tooltip working in craft bag
     - [ ] Investigate if there is a tooltip in the craft bag and if it can be hooked
@@ -15,6 +14,7 @@
 
 ## Done
 
+- [x] Get tooltip working in guild store listings
 - [x] Get the average price into the guild listing automatically
 - [x] Add advanced filtering options
     - [x] Hide price for bound or non-tradable items
