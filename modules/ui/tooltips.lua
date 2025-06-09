@@ -73,17 +73,36 @@ local function AddPriceSection(tooltip, itemLink)
     local priceSection = tooltip:AcquireSection(tooltip:GetStyle("bodySection"))
     priceSection:AddLine(colorize("Tamriel Savings Co", COLORS.TSC_GREEN), tooltip:GetStyle("bodyDescription"))
 
-    -- Always show average price (handles "no price data" internally)
-    local formattedPrice = TSCPriceFetcher.modules.dataAdapter.getFormattedAvgPrice(itemLink)
-    priceSection:AddLine("Average Price: " .. formattedPrice, tooltip:GetStyle("bodyDescription"))
+    -- Check if item is bound first - if so, just show bound message and return
+    if IsItemLinkBound(itemLink) then
+        priceSection:AddLine("Bound Item", tooltip:GetStyle("bodyDescription"))
+        tooltip:AddSection(priceSection)
+        return
+    end
 
-    -- Show additional info if available
+    -- Item is not bound, check if we have price data
+    local formattedPrice = TSCPriceFetcher.modules.dataAdapter.getFormattedAvgPrice(itemLink)
     local priceRange = TSCPriceFetcher.modules.dataAdapter.getFormattedPriceRange(itemLink)
+    local salesCount = TSCPriceFetcher.modules.dataAdapter.getSalesCount(itemLink)
+
+    -- Check if we have any price data at all
+    local hasData = formattedPrice or priceRange or salesCount
+
+    if not hasData then
+        priceSection:AddLine("No Price Data Available", tooltip:GetStyle("bodyDescription"))
+        tooltip:AddSection(priceSection)
+        return
+    end
+
+    -- We have price data, show it all
+    if formattedPrice then
+        priceSection:AddLine("Average Price: " .. formattedPrice, tooltip:GetStyle("bodyDescription"))
+    end
+
     if priceRange then
         priceSection:AddLine("Range: " .. priceRange, tooltip:GetStyle("bodyDescription"))
     end
 
-    local salesCount = TSCPriceFetcher.modules.dataAdapter.getSalesCount(itemLink)
     if salesCount then
         priceSection:AddLine("Sales: " .. tostring(salesCount), tooltip:GetStyle("bodyDescription"))
     end

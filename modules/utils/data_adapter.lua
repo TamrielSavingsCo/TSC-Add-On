@@ -24,11 +24,6 @@ function DataAdapter.getAvgPrice(itemLink)
         return nil
     end
 
-    -- Check if item is bound
-    if IsItemLinkBound(itemLink) then
-        return "bound item"
-    end
-
     -- Get item ID from link
     local itemId = GetItemLinkItemId(itemLink)
     if not itemId then
@@ -44,7 +39,7 @@ function DataAdapter.getAvgPrice(itemLink)
     end
 
     TSCPriceFetcher.modules.debug.log("Price lookup result for ID " .. tostring(itemId) .. ": " .. tostring(price))
-    return price
+    return price -- Returns nil if no data found
 end
 
 -- Get min price (only available with full data)
@@ -111,17 +106,12 @@ end
 function DataAdapter.getFormattedAvgPrice(itemLink)
     local result = DataAdapter.getAvgPrice(itemLink)
 
-    -- Handle special messages
-    if result == "bound item" then
-        return result
-    end
-
     -- Handle numeric price
     if result then
         return TSC_FormatterModule.toGold(result) .. " " .. goldIcon
     end
 
-    return "no price data"
+    return nil -- Let tooltip handle "no data" display
 end
 
 -- Get formatted price range (only for full data)
