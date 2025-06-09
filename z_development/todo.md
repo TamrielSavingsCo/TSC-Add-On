@@ -8,8 +8,6 @@
 - [ ] Get tooltip working in loot windows
 - [ ] Get tooltip working in craft bag
     - [ ] Investigate if there is a tooltip in the craft bag and if it can be hooked
-- [ ] When listing item, make a search in the guild for other listings
-    - [ ] Show them and their info to the user
 - [ ] Add keybinds for left and right bumpers to adjust the price up and down by 5%
 
 ## Done
@@ -32,3 +30,5 @@
         - [ ] for toggling whether to automatically populate guild listing with average price
     - [ ] icon size
 - [ ] Add price trends (min/max/average, last updated date)
+- [ ] When listing item, make a search in the guild for other listings
+    - [ ] Show them and their info to the user
