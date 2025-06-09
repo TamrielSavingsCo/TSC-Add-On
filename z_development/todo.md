@@ -1,15 +1,5 @@
-work with dependencies:
-- [x] Update the lookup module to check TSCPriceFetcher.dataSource and call appropriate data addon API
-- [x] Create adapter functions to normalize differences between full/lite data addon APIs
-- [x] Handle data format differences (array vs single number) in lookup module
-- [x] Add feature detection for conditional UI elements based on available data source
-- [x] Remove hardcoded TSCPriceNameData.lua dependency once external data sources work
-- [x] Add fallback handling for when data addon exists but returns null/empty for specific items
-- [x] Test all scenarios: full data, lite data, and no data
-
 # TODO
 
-- [ ] Get the average price into the guild listing automatically
 - [ ] Get tooltip working for weapons and armor
 - [ ] Get tooltip working in shop interface
 - [ ] Get tooltip working in mail attachments
@@ -19,13 +9,15 @@ work with dependencies:
 - [ ] Get tooltip working in loot windows
 - [ ] Get tooltip working in craft bag
     - [ ] Investigate if there is a tooltip in the craft bag and if it can be hooked
+- [ ] When listing item, make a search in the guild for other listings
+    - [ ] Show them and their info to the user
+- [ ] Add keybinds for left and right bumpers to adjust the price up and down by 5%
 
+## Done
 
+- [x] Get the average price into the guild listing automatically
 - [x] Add advanced filtering options
     - [x] Hide price for bound or non-tradable items
-
-# Refactor
-
 - [x] refactor the data file to use ids for items with single ids
 - [x] refactor the data file to use names for items with multiple ids
 - [x] refactor the lookup to try by id first, then fall back to name
