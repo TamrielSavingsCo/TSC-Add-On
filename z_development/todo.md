@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] Get tooltip working for weapons and armor
+
 - [ ] Get tooltip working in shop interface
 - [ ] Get tooltip working in mail attachments
 - [ ] Get tooltip working in trade windows
@@ -21,6 +21,8 @@
 - [x] refactor the data file to use ids for items with single ids
 - [x] refactor the data file to use names for items with multiple ids
 - [x] refactor the lookup to try by id first, then fall back to name
+- [x] Get tooltip working for weapons and armor
+    - User needs to go into the category to see the individual equipment tooltip
 
 ## Nice to have
 
