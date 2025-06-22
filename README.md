@@ -7,6 +7,7 @@ Never wonder about fair market values again! TSC Price Fetcher displays accurate
 - **Real Price Data**: Sourced from actual transactions in Xbox NA guild traders
 - **Weekly Updates**: Fresh price data every Wednesday, reflecting the latest market trends
 - **Seamless Integration**: Prices appear right in your gamepad inventory tooltips
+- **Guild Store Integration**: Automatically replaces default item values with market averages when listing items
 - **Lightweight Design**: Optimized for console, ensuring smooth performance
 
 ## Details
@@ -28,7 +29,7 @@ If no price data addon is installed, you'll see a message directing you to insta
 
 ## Version Info
 
-- Current Version: 0.0.2
+- Current Version: 1.0.2
 - ESO API Compatibility: 101045, 101046, 101047
 - Data updates every Wednesday
 
