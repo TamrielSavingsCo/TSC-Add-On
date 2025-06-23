@@ -1,6 +1,7 @@
 # TODO
 
 
+- [ ] Get tooltip working in guild trader when viewing items
 - [ ] Get tooltip working in shop interface
 - [ ] Get tooltip working in mail attachments
 - [ ] Get tooltip working in trade windows
