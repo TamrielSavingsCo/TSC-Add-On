@@ -1,6 +1,6 @@
 # Tamriel Savings Co Price Fetcher
 
-Never wonder about fair market values again! TSC Price Fetcher displays accurate market prices directly in your item tooltips, powered by weekly data from thousands of actual guild trader transactions on the Xbox NA server.
+Never wonder about fair market values again! TSC Price Fetcher displays accurate market prices directly in your item tooltips, powered by weekly data from thousands of actual guild trader transactions on the Xbox NA server.  To power these tooltips with data, you'll also need to download the TSCPriceDataLite addon.
 
 ## Features
 
@@ -13,23 +13,20 @@ Never wonder about fair market values again! TSC Price Fetcher displays accurate
 ## Details
 
 - **Price Information**: 
-  - Average item values (with either TSCPriceDataLite or TSCPriceData )
-  - Price ranges (with TSCPriceData)
-  - Number of recent sales (with TSCPriceData)
+  - Average item values
 - **Data Source**: Over 100,000 weekly transactions from 40 top trading guilds
 - **Server**: Xbox NA
 
 ## Requirements
 
-The addon requires one of these price data addons:
-- TSCPriceData (recommended - includes price ranges and sales data)
-- TSCPriceDataLite (smaller file - average prices only)
+The addon requires this price data addon:
+- TSCPriceDataLite
 
 If no price data addon is installed, you'll see a message directing you to install one.
 
 ## Version Info
 
-- Current Version: 1.0.3
+- Current Version: 1.0.4
 - ESO API Compatibility: 101045, 101046, 101047
 - Data updates every Wednesday
 

@@ -2,7 +2,7 @@ d("TSCPriceFetcher.lua loaded")
 -- main.lua
 local TSCPriceFetcher = {
     name = "TSCPriceFetcher",
-    version = "1.0.3",
+    version = "1.0.4",
     modules = {}, -- Container for our modules
     dataSource = "none",
     priceEnabled = false
@@ -20,13 +20,22 @@ TSCPriceFetcher.modules.lookup = TSC_LookupModule
 TSCPriceFetcher.modules.dataAdapter = TSC_DataAdapterModule
 
 -- Data source detection and initialization
+-- local function detectDataSources()
+--     local hasFullData = _G.TSCPriceData ~= nil
+--     local hasAverageData = _G.TSCPriceDataLite ~= nil
+
+--     if hasFullData then
+--         return "full"
+--     elseif hasAverageData then
+--         return "lite"
+--     else
+--         return "none"
+--     end
+-- end
 local function detectDataSources()
-    local hasFullData = _G.TSCPriceData ~= nil
     local hasAverageData = _G.TSCPriceDataLite ~= nil
 
-    if hasFullData then
-        return "full"
-    elseif hasAverageData then
+    if hasAverageData then
         return "lite"
     else
         return "none"
@@ -35,8 +44,9 @@ end
 
 local function notifyMissingData()
     d("|cFF6B6B[TSC Price Fetcher]|r No price data addon detected!")
-    d("|cFFFFFF - Install either 'TSCPriceDataFull' for complete price data")
-    d("|cFFFFFF - Or 'TSCPriceDataLite' for average prices only")
+    d("|cFFFFFF - Install 'TSCPriceDataLite'")
+    -- d("|cFFFFFF - Install either 'TSCPriceDataFull' for complete price data")
+    -- d("|cFFFFFF - Or 'TSCPriceDataLite' for average prices only")
 end
 
 function TSCPriceFetcher.initializeDataSource()
