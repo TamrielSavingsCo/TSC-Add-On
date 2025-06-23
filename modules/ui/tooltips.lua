@@ -147,9 +147,9 @@ function Tooltips.AddPriceToGamepadTooltip(tooltipObject, tooltipType, itemLink)
         return true
     end)
 
-    if not success and TSCPriceFetcher and TSCPriceFetcher.modules and TSCPriceFetcher.modules.debug then
-        TSCPriceFetcher.modules.debug.error("Failed to add price to tooltip: " .. tostring(result))
-    end
+    -- if not success and TSCPriceFetcher and TSCPriceFetcher.modules and TSCPriceFetcher.modules.debug then
+        -- TSCPriceFetcher.modules.debug.error("Failed to add price to tooltip: " .. tostring(result))
+    -- end
 end
 
 TSC_TooltipsModule = Tooltips
