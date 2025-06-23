@@ -2,7 +2,7 @@ d("TSCPriceFetcher.lua loaded")
 -- main.lua
 local TSCPriceFetcher = {
     name = "TSCPriceFetcher",
-    version = "0.0.1",
+    version = "1.0.3",
     modules = {}, -- Container for our modules
     dataSource = "none",
     priceEnabled = false

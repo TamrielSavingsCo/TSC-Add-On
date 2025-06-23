@@ -29,7 +29,7 @@ If no price data addon is installed, you'll see a message directing you to insta
 
 ## Version Info
 
-- Current Version: 1.0.2
+- Current Version: 1.0.3
 - ESO API Compatibility: 101045, 101046, 101047
 - Data updates every Wednesday
 
